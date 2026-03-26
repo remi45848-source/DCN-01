@@ -21,9 +21,22 @@
             padding: 20px 50px; font-size: 1.3em; font-family: 'Noto Serif SC', 'Cormorant Garamond', serif; font-weight: 300;
             letter-spacing: 3px; background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.3); color: #fff; cursor: pointer;
-            border-radius: 2px; transition: all 0.4s ease;
+            border-radius: 2px; transition: all 0.4s ease; display: none;
         }
         #startButton:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.5); }
+        .access-gate { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+        .access-label { font-size: 0.85em; letter-spacing: 3px; color: rgba(255,255,255,0.35); }
+        .access-input {
+            width: 240px; padding: 14px 20px; font-size: 1.1em; font-family: 'Noto Serif SC', 'Cormorant Garamond', serif;
+            font-weight: 300; letter-spacing: 2px; text-align: center;
+            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.15);
+            color: #fff; border-radius: 2px; outline: none; transition: all 0.4s ease;
+        }
+        .access-input::placeholder { color: rgba(255,255,255,0.2); }
+        .access-input:focus { border-color: rgba(255,255,255,0.4); background: rgba(255,255,255,0.06); }
+        .access-input.error { border-color: rgba(200,60,60,0.6); animation: shake 0.4s ease; }
+        .access-error { font-size: 0.8em; color: rgba(200,60,60,0.7); letter-spacing: 2px; height: 1em; }
+        @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
 
         .video-loader {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
@@ -104,6 +117,11 @@
     </audio>
 
     <div id="startOverlay">
+        <div class="access-gate" id="accessGate">
+            <div class="access-label">请输入访问密码</div>
+            <input class="access-input" id="accessInput" type="password" placeholder="输入密码" autocomplete="off" spellcheck="false">
+            <div class="access-error" id="accessError"></div>
+        </div>
         <button id="startButton">进入故事</button>
     </div>
 
@@ -198,6 +216,26 @@
             }
             document.getElementById('startButton').addEventListener('click', startExperience);
             document.getElementById('startButton').addEventListener('touchend', function(e) { e.preventDefault(); startExperience(); });
+
+            var accessInput = document.getElementById('accessInput');
+            var accessError = document.getElementById('accessError');
+            var accessGate = document.getElementById('accessGate');
+            accessInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    if (accessInput.value.toLowerCase().trim() === 'flickfiction') {
+                        accessGate.style.opacity = '0';
+                        accessGate.style.transition = 'opacity 0.5s ease';
+                        setTimeout(function() {
+                            accessGate.style.display = 'none';
+                            document.getElementById('startButton').style.display = '';
+                        }, 500);
+                    } else {
+                        accessInput.classList.add('error');
+                        accessError.textContent = '密码错误';
+                        setTimeout(function() { accessInput.classList.remove('error'); accessError.textContent = ''; }, 1500);
+                    }
+                }
+            });
         }
 
         function preloadAround(index) {
