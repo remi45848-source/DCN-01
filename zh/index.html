@@ -227,7 +227,7 @@
                         accessGate.style.transition = 'opacity 0.5s ease';
                         setTimeout(function() {
                             accessGate.style.display = 'none';
-                            document.getElementById('startButton').style.display = '';
+                            document.getElementById('startButton').style.display = 'inline-block';
                         }, 500);
                     } else {
                         accessInput.classList.add('error');
@@ -322,7 +322,7 @@
         }
 
         function gotoState(index) {
-            if (index < 0 || index >= states.length || isTransitioning) return;
+            if (!started || index < 0 || index >= states.length || isTransitioning) return;
             if (currentIndex === INTERACTIVE_INDEX && index > INTERACTIVE_INDEX && !interactiveComplete) return;
             isTransitioning = true;
             var prevState = currentIndex >= 0 ? states[currentIndex] : null;
