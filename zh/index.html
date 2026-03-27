@@ -140,6 +140,35 @@
             from { opacity: 0; transform: scale(0.98); }
             to { opacity: 1; transform: scale(1); }
         }
+        .s9-scroll-hint {
+            position: absolute;
+            left: 50%;
+            bottom: 18%;
+            transform: translateX(-50%);
+            z-index: 20;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            opacity: 0;
+            pointer-events: none;
+            animation: s9HintAppear 0.6s ease 1.8s forwards;
+        }
+        .s9-scroll-hint svg {
+            width: 22px; height: 22px;
+            fill: none; stroke: rgba(255,255,255,0.6);
+            stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round;
+            animation: s9HintBounce 1.4s ease-in-out infinite;
+        }
+        .s9-scroll-hint span {
+            font-size: 10px; color: rgba(255,255,255,0.45);
+            letter-spacing: 1px; text-transform: uppercase; font-weight: 500;
+        }
+        @keyframes s9HintAppear { to { opacity: 1; } }
+        @keyframes s9HintBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(5px); }
+        }
 
         .s20-audio-shell {
             width: 100%;
@@ -226,8 +255,8 @@
 
         .nav-hint {
             position: fixed;
-            right: 18px;
-            bottom: 32px;
+            right: 14px;
+            bottom: 24px;
             left: auto;
             transform: none;
             font-size: 18px;
@@ -248,10 +277,10 @@
             position: fixed;
             right: 0;
             bottom: 0;
-            width: min(42vw, 168px);
-            height: min(38vh, 220px);
+            width: min(22vw, 90px);
+            height: min(22vh, 140px);
             z-index: 1600;
-            touch-action: pan-y;
+            touch-action: none;
             background: transparent;
         }
 
@@ -358,13 +387,13 @@
               label: '[ UI \u2014 S5 \u00b7 short vertical feed ]' },
 
             { type: 'text', tone: 'tone-opinion',
-              html: '<p>Some said: this is justice.</p><p>Some said: this is terror.</p><p>Some said: this has nothing to do with us.</p>' },
-
-            { type: 'text', tone: 'tone-opinion',
               html: '<p>The Dalton family: three generations in the Senate.<br>One Vice President. Nearly forty years of influence.</p><p class="emphasis">The law never truly reached them.</p>' },
 
             { type: 'text', tone: 'tone-opinion',
               html: '<p class="emphasis">Now someone found another way to finish it.</p>' },
+
+            { type: 'text', tone: 'tone-opinion',
+              html: '<p>Some said: this is justice.</p><p>Some said: this is terror.</p><p>Some said: this has nothing to do with us.</p>' },
 
             { type: 'ui', tone: 'tone-opinion',
               label: '[ UI \u2014 S9 \u00b7 comment battlefield ]' },
@@ -572,7 +601,7 @@
                 if (blackoutLock || currentIndex < 0) return;
                 if (scrollCooldown) return;
                 var diff = cornerTouchStartY - e.changedTouches[0].clientY;
-                if (Math.abs(diff) < 50) return;
+                if (Math.abs(diff) < 60) return;
                 scrollCooldown = true;
                 if (diff > 0) gotoState(currentIndex + 1);
                 else gotoState(currentIndex - 1);
@@ -747,6 +776,12 @@
                     s9Frame.classList.remove('s9-fade-in');
                     setTimeout(function () { s9Frame.classList.add('s9-fade-in'); }, 20);
                 }
+                var oldHint9 = activeEl.querySelector('.s9-scroll-hint');
+                if (oldHint9) oldHint9.remove();
+                var scrollHint9 = document.createElement('div');
+                scrollHint9.className = 's9-scroll-hint';
+                scrollHint9.innerHTML = '<svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg><span>scroll</span>';
+                activeEl.appendChild(scrollHint9);
             }
             var activeText = activeEl.querySelector('.text-content');
             if (activeText) activeText.classList.remove('s31-fade-in');
@@ -821,6 +856,16 @@
                 }
                 if (index === 16) {
                     startActiveVideo(index, activeEl);
+                    var s17bgAudio = new Audio('https://pub-0f8fb9a88fd749b0987b026db4672ab5.r2.dev/town_cross_roads2.mp3');
+                    s17bgAudio.volume = 0.15;
+                    s17bgAudio.loop = true;
+                    s17bgAudio.play().catch(function(){});
+                    var origOnEnded = activeEl.querySelector('video.story-video').onended;
+                    activeEl.querySelector('video.story-video').onended = function () {
+                        s17bgAudio.pause();
+                        s17bgAudio.src = '';
+                        if (origOnEnded) origOnEnded();
+                    };
                     return;
                 }
                 if (!startActiveVideo(index, activeEl)) {
