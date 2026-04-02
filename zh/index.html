@@ -576,6 +576,7 @@
         var blackoutLock = false;
         var firstHintTimer = null;
         var pendingS13AutoNext = false;
+        var SWIPE_COOLDOWN_MS = 650;
         var onboardingStep = 0;
         var onboardingDone = false;
         var onboardingStep2ReadyAt = 0;
@@ -743,7 +744,7 @@
                 scrollCooldown = true;
                 if (e.deltaY > 0) gotoState(currentIndex + 1);
                 else if (e.deltaY < 0) gotoState(currentIndex - 1);
-                setTimeout(function() { scrollCooldown = false; }, 1200);
+                setTimeout(function() { scrollCooldown = false; }, SWIPE_COOLDOWN_MS);
             }, { passive: true });
 
             var cornerTouchStartY = 0;
@@ -761,13 +762,13 @@
                     if (onboardingStep !== 2) return;
                     scrollCooldown = true;
                     if (diff > 0) gotoState(1);
-                    setTimeout(function() { scrollCooldown = false; }, 1200);
+                    setTimeout(function() { scrollCooldown = false; }, SWIPE_COOLDOWN_MS);
                     return;
                 }
                 scrollCooldown = true;
                 if (diff > 0) gotoState(currentIndex + 1);
                 else gotoState(currentIndex - 1);
-                setTimeout(function() { scrollCooldown = false; }, 1200);
+                setTimeout(function() { scrollCooldown = false; }, SWIPE_COOLDOWN_MS);
             }, { passive: true });
 
             var fullTouchStartY = 0;
@@ -788,7 +789,7 @@
                 scrollCooldown = true;
                 if (diff > 0) gotoState(currentIndex + 1);
                 else gotoState(currentIndex - 1);
-                setTimeout(function() { scrollCooldown = false; }, 1200);
+                setTimeout(function() { scrollCooldown = false; }, SWIPE_COOLDOWN_MS);
             }, { passive: true });
 
             function handleOnboardingTap() {
@@ -942,13 +943,6 @@
             var allStates = document.querySelectorAll('.state');
             for (var s = 0; s < allStates.length; s++) {
                 allStates[s].classList.remove('active');
-                var prevIframe = allStates[s].querySelector('iframe.story-iframe');
-                if (prevIframe && parseInt(allStates[s].getAttribute('data-index')) !== index) {
-                    var dataSrc = prevIframe.getAttribute('data-src');
-                    if (dataSrc && prevIframe.src !== 'about:blank') {
-                        prevIframe.src = 'about:blank';
-                    }
-                }
             }
 
             var activeEl = document.querySelector('[data-index="' + index + '"]');
