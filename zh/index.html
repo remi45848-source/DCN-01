@@ -277,8 +277,8 @@
             position: fixed;
             right: 0;
             bottom: 0;
-            width: min(22vw, 90px);
-            height: min(22vh, 140px);
+            width: min(34vw, 150px);
+            height: min(34vh, 220px);
             z-index: 1600;
             touch-action: none;
             background: transparent;
@@ -303,6 +303,88 @@
             filter: grayscale(1);
             opacity: 0.9;
             animation: handSwipeDown 2.2s ease-in-out infinite;
+        }
+        #onboardingGuide {
+            position: fixed;
+            inset: 0;
+            z-index: 1750;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.35s ease;
+        }
+        #onboardingGuide.visible { opacity: 1; }
+        .onboard-title {
+            position: absolute;
+            top: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            letter-spacing: 0.18em;
+            text-transform: lowercase;
+            color: rgba(255,255,255,0.72);
+            opacity: 1;
+        }
+        .onboard-step {
+            position: absolute;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+        .onboard-step.active { display: flex; }
+        #onboardStep1 {
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+        #onboardStep2 {
+            right: 16px;
+            bottom: 20px;
+            align-items: flex-end;
+        }
+        .onboard-hand {
+            width: 34px;
+            height: 34px;
+            display: block;
+            color: rgba(255,255,255,0.9);
+            filter: drop-shadow(0 0 14px rgba(255,255,255,0.2));
+            user-select: none;
+        }
+        .onboard-hand path {
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.9;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+        .onboard-caption {
+            font-size: 11px;
+            letter-spacing: 0.16em;
+            text-transform: lowercase;
+            color: rgba(255,255,255,0.78);
+        }
+        .hand-drag { animation: onboardDragLoop 1.6s ease-in-out infinite; }
+        .hand-down { animation: onboardDownLoop 1.3s ease-in-out infinite; }
+        .tap-ring {
+            position: absolute;
+            width: 42px;
+            height: 42px;
+            border: 1px solid rgba(255,255,255,0.42);
+            border-radius: 999px;
+            animation: tapPulse 1.25s ease-out infinite;
+        }
+        @keyframes onboardDragLoop {
+            0%, 100% { transform: translateY(-8px); }
+            50% { transform: translateY(8px); }
+        }
+        @keyframes onboardDownLoop {
+            0% { transform: translateY(0); opacity: 0.7; }
+            60% { transform: translateY(12px); opacity: 1; }
+            100% { transform: translateY(0); opacity: 0.7; }
+        }
+        @keyframes tapPulse {
+            0% { transform: scale(0.75); opacity: 0.7; }
+            100% { transform: scale(1.45); opacity: 0; }
         }
         @keyframes handSwipeDown {
             0%, 100% { transform: translateY(0); }
@@ -362,6 +444,34 @@
     <div class="nav-hint" id="navHint"><span class="arrow">&#709;</span><span class="arrow" style="animation-delay:0.15s">&#709;</span></div>
     <div id="navCornerSwipe" aria-hidden="true"></div>
     <div id="firstGestureHint" aria-hidden="true"><span class="hand-icon" title="">&#x1F446;</span></div>
+    <div id="onboardingGuide" aria-hidden="true">
+        <div class="onboard-title" id="onboardTitle">how to read flickfiction</div>
+        <div class="onboard-step" id="onboardStep1">
+            <span class="tap-ring"></span>
+            <svg class="onboard-hand hand-drag" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 22V11.5a1.5 1.5 0 0 1 3 0v5.2"/>
+                <path d="M15 16.7v-2.6a1.5 1.5 0 0 1 3 0v2.9"/>
+                <path d="M9 17.2v-3.7a1.5 1.5 0 0 1 3 0"/>
+                <path d="M6 17.5v-2.2a1.5 1.5 0 0 1 3 0"/>
+                <path d="M6.2 18.6c1.5 2.4 3.1 3.4 5.8 3.4 2.8 0 5.1-1.2 6.3-3.4"/>
+                <path d="M12 3.2v4.3"/>
+                <path d="M9.8 5.4L12 3.2l2.2 2.2"/>
+            </svg>
+            <span class="onboard-caption">here to drug</span>
+        </div>
+        <div class="onboard-step" id="onboardStep2">
+            <svg class="onboard-hand hand-down" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 2v10.5a1.5 1.5 0 0 0 3 0V7.3"/>
+                <path d="M15 7.3v2.6a1.5 1.5 0 0 0 3 0V7"/>
+                <path d="M9 6.8v3.7a1.5 1.5 0 0 0 3 0"/>
+                <path d="M6 6.5v2.2a1.5 1.5 0 0 0 3 0"/>
+                <path d="M6.2 5.4C7.7 3 9.3 2 12 2c2.8 0 5.1 1.2 6.3 3.4"/>
+                <path d="M12 20.8v-4.3"/>
+                <path d="M9.8 18.6L12 20.8l2.2-2.2"/>
+            </svg>
+            <span class="onboard-caption">scroll here to next state</span>
+        </div>
+    </div>
 
     <script>
         var ambientAudio = new Audio("https://files.catbox.moe/jn29tb.mp3");
@@ -370,6 +480,8 @@
         var alertBellUrl = 'https://pub-0f8fb9a88fd749b0987b026db4672ab5.r2.dev/iPhone%E7%9F%AD%E4%BF%A1%E9%93%83%E5%A3%B0_%E7%88%B1%E7%BB%99%E7%BD%91_aigei_com.mp3';
 
         var states = [
+            { type: 'onboarding', tone: 'tone-rain-open', label: '' },
+
             { type: 'text', tone: 'tone-rain-open',
               html: '<p>The rain was still there. Not last night&#39;s violence.<br>This was the rain that lingers: fine, even, patient.<br>As if the sky still hadn&#39;t decided how to end it.</p>' },
 
@@ -464,6 +576,48 @@
         var blackoutLock = false;
         var firstHintTimer = null;
         var pendingS13AutoNext = false;
+        var onboardingStep = 0;
+        var onboardingDone = false;
+        var onboardingStep2ReadyAt = 0;
+        var onboardingLastInputAt = 0;
+
+        function showOnboardingStep1() {
+            if (onboardingDone) return;
+            var guide = document.getElementById('onboardingGuide');
+            var s1 = document.getElementById('onboardStep1');
+            var s2 = document.getElementById('onboardStep2');
+            var title = document.getElementById('onboardTitle');
+            guide.classList.add('visible');
+            s1.classList.add('active');
+            s2.classList.remove('active');
+            title.style.opacity = '1';
+            onboardingStep = 1;
+        }
+
+        function showOnboardingStep2() {
+            if (onboardingDone || onboardingStep !== 1) return;
+            var s1 = document.getElementById('onboardStep1');
+            var s2 = document.getElementById('onboardStep2');
+            var title = document.getElementById('onboardTitle');
+            s1.classList.remove('active');
+            s2.classList.add('active');
+            title.style.opacity = '1';
+            onboardingStep = 2;
+            onboardingStep2ReadyAt = Date.now() + 320;
+        }
+
+        function hideOnboardingGuide() {
+            var guide = document.getElementById('onboardingGuide');
+            var s1 = document.getElementById('onboardStep1');
+            var s2 = document.getElementById('onboardStep2');
+            var title = document.getElementById('onboardTitle');
+            guide.classList.remove('visible');
+            s1.classList.remove('active');
+            s2.classList.remove('active');
+            title.style.opacity = '0';
+            onboardingDone = true;
+            onboardingStep = 0;
+        }
 
         function updateFirstGestureHint(index) {
             var el = document.getElementById('firstGestureHint');
@@ -484,15 +638,15 @@
         }
 
         var interactiveIframes = {
-            3:  'https://remi45848-source.github.io/rainshot-ep2/S4.html',
-            4:  'https://remi45848-source.github.io/rainshot-ep2/S7.html',
-            8:  'https://remi45848-source.github.io/rainshot-ep2/S11.html',
-            9:  'https://remi45848-source.github.io/rainshot-ep2/S13.html',
-            11: 'https://remi45848-source.github.io/rainshot-ep2/S17.html',
-            14: 'https://remi45848-source.github.io/rainshot-ep2/S19.html',
-            18: 'https://remi45848-source.github.io/rainshot-ep2/S22.html',
-            21: 'https://remi45848-source.github.io/rainshot-ep2/S32.html',
-            23: 'https://remi45848-source.github.io/rainshot-ep2/S34.html'
+            4:  'https://remi45848-source.github.io/rainshot-ep2/S4.html',
+            5:  'https://remi45848-source.github.io/rainshot-ep2/S7.html',
+            9:  'https://remi45848-source.github.io/rainshot-ep2/S11.html',
+            10: 'https://remi45848-source.github.io/rainshot-ep2/S13.html',
+            12: 'https://remi45848-source.github.io/rainshot-ep2/S17.html',
+            15: 'https://remi45848-source.github.io/rainshot-ep2/S19.html',
+            19: 'https://remi45848-source.github.io/rainshot-ep2/S22.html',
+            22: 'https://remi45848-source.github.io/rainshot-ep2/S32.html',
+            24: 'https://remi45848-source.github.io/rainshot-ep2/S34.html'
         };
 
         function buildStateElement(index, state) {
@@ -585,6 +739,7 @@
                 if (scrollCooldown) return;
                 if (currentIndex < 0) return;
                 if (blackoutLock) return;
+                if (currentIndex === 0) return;
                 scrollCooldown = true;
                 if (e.deltaY > 0) gotoState(currentIndex + 1);
                 else if (e.deltaY < 0) gotoState(currentIndex - 1);
@@ -601,7 +756,14 @@
                 if (blackoutLock || currentIndex < 0) return;
                 if (scrollCooldown) return;
                 var diff = cornerTouchStartY - e.changedTouches[0].clientY;
-                if (Math.abs(diff) < 60) return;
+                if (Math.abs(diff) < 26) return;
+                if (currentIndex === 0) {
+                    if (onboardingStep !== 2) return;
+                    scrollCooldown = true;
+                    if (diff > 0) gotoState(1);
+                    setTimeout(function() { scrollCooldown = false; }, 1200);
+                    return;
+                }
                 scrollCooldown = true;
                 if (diff > 0) gotoState(currentIndex + 1);
                 else gotoState(currentIndex - 1);
@@ -620,6 +782,7 @@
                 if (states[currentIndex].type !== 'text') return;
                 if (currentIndex === TOTAL - 1) return;
                 if (scrollCooldown) return;
+                if (currentIndex === 0) return;
                 var diff = fullTouchStartY - e.changedTouches[0].clientY;
                 if (Math.abs(diff) < 50) return;
                 scrollCooldown = true;
@@ -628,9 +791,30 @@
                 setTimeout(function() { scrollCooldown = false; }, 1200);
             }, { passive: true });
 
+            function handleOnboardingTap() {
+                if (currentIndex !== 0) return;
+                var now = Date.now();
+                if (now - onboardingLastInputAt < 220) return;
+                onboardingLastInputAt = now;
+                if (onboardingStep === 1) {
+                    showOnboardingStep2();
+                    return;
+                }
+                if (onboardingStep === 2 && !scrollCooldown) {
+                    if (now < onboardingStep2ReadyAt) return;
+                    scrollCooldown = true;
+                    gotoState(1);
+                    setTimeout(function() { scrollCooldown = false; }, 800);
+                }
+            }
+            window.addEventListener('pointerdown', handleOnboardingTap, { passive: true });
+            window.addEventListener('touchstart', handleOnboardingTap, { passive: true });
+            window.addEventListener('click', handleOnboardingTap, { passive: true });
+
             window.addEventListener('keydown', function(e) {
                 if (blackoutLock) return;
                 if (currentIndex < 0) return;
+                if (currentIndex === 0) return;
                 if (e.key === 'Escape') {
                     var ae = document.activeElement;
                     if (ae && ae.tagName === 'IFRAME') {
@@ -666,7 +850,7 @@
         }
 
         function shouldRestartIframe(index) {
-            return index === 3 || index === 9 || index === 11 || index === 14 || index === 18 || index === 21 || index === 23;
+            return index === 4 || index === 10 || index === 12 || index === 15 || index === 19 || index === 22 || index === 24;
         }
 
         function primeActiveIframe(index, activeEl) {
@@ -715,7 +899,7 @@
             try {
                 video.pause();
                 video.currentTime = 0;
-                video.muted = (index === 16);
+                video.muted = (index === 17);
                 video.autoplay = true;
                 video.onended = function () {
                     if (currentIndex === index) gotoState(index + 1);
@@ -769,8 +953,9 @@
 
             var activeEl = document.querySelector('[data-index="' + index + '"]');
             activeEl.classList.add('active');
+            if (index !== 0) hideOnboardingGuide();
             primeActiveIframe(index, activeEl);
-            if (index === 8) {
+            if (index === 9) {
                 var s9Frame = activeEl.querySelector('iframe.story-iframe');
                 if (s9Frame) {
                     s9Frame.classList.remove('s9-fade-in');
@@ -791,7 +976,7 @@
             for (var a = 0; a < animSpans.length; a++) animSpans[a].classList.remove('anim');
             var activeVideoEl = activeEl.querySelector('video.story-video');
             if (activeVideoEl) activeVideoEl.classList.remove('s11-delayed-fade');
-            if (index === 10 && activeVideoEl) {
+            if (index === 11 && activeVideoEl) {
                 setTimeout(function () { activeVideoEl.classList.add('s11-delayed-fade'); }, 20);
             }
 
@@ -805,8 +990,14 @@
             updateFirstGestureHint(index);
             pendingS13AutoNext = false;
 
+            if (state.type === 'onboarding') {
+                showOnboardingStep1();
+                setTimeout(function() { isTransitioning = false; }, 250);
+                return;
+            }
+
             if (state.type === 'text') {
-                if (index === 19 && activeText) {
+                if (index === 20 && activeText) {
                     var l1 = activeText.querySelector('.s20-line1');
                     var l2 = activeText.querySelector('.s20-line2');
                     var l3 = activeText.querySelector('.s20-line3');
@@ -815,10 +1006,10 @@
                     if (l3) { l3.classList.remove('anim'); void l3.offsetWidth; l3.classList.add('anim'); }
                     activeText.classList.add('s20-dim-after');
                     autoTimer = setTimeout(function() {
-                        if (currentIndex === 19) gotoState(20);
+                        if (currentIndex === 20) gotoState(21);
                     }, 6400);
                 }
-                if (index === 20 && activeText) {
+                if (index === 21 && activeText) {
                     activeText.classList.add('s21-delayed-fade');
                 }
                 if (index === TOTAL - 1) {
@@ -848,13 +1039,13 @@
 
             if (state.type === 'video') {
                 setTimeout(function() { isTransitioning = false; }, 800);
-                if (index === 10) {
+                if (index === 11) {
                     setTimeout(function () {
-                        if (currentIndex === 10) startActiveVideo(index, activeEl);
+                        if (currentIndex === 11) startActiveVideo(index, activeEl);
                     }, 2000);
                     return;
                 }
-                if (index === 16) {
+                if (index === 17) {
                     startActiveVideo(index, activeEl);
                     var s17bgAudio = new Audio('https://pub-0f8fb9a88fd749b0987b026db4672ab5.r2.dev/town_cross_roads2.mp3');
                     s17bgAudio.volume = 0.15;
@@ -877,7 +1068,7 @@
             }
 
             if (state.type === 'audio') {
-                if (index === 9) {
+                if (index === 10) {
                     playBell(0.9);
                 }
                 pendingS13AutoNext = true;
@@ -888,7 +1079,7 @@
             }
 
             if (state.type === 'ui') {
-                if (index === 3) playBell(0.9);
+                if (index === 4) playBell(0.9);
                 setTimeout(function() { hint.classList.add('visible'); }, 1200);
                 setTimeout(function() { isTransitioning = false; }, 800);
                 setTimeout(focusStoryShell, 200);
