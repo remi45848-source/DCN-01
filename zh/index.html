@@ -112,7 +112,15 @@
             opacity: 0;
             animation: s11DelayedFade 1.5s ease 2s forwards;
         }
+        .state video.story-video.s13-delayed-fade {
+            opacity: 0;
+            animation: s13DelayedFade 0.6s ease 2s forwards;
+        }
         @keyframes s11DelayedFade {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes s13DelayedFade {
             from { opacity: 0; }
             to { opacity: 1; }
         }
@@ -140,34 +148,187 @@
             from { opacity: 0; transform: scale(0.98); }
             to { opacity: 1; transform: scale(1); }
         }
-        .s9-scroll-hint {
+        /* TikTok-like narrative feed (S3 autoplay, no between-clip gestures) */
+        .feed-frame {
             position: absolute;
-            left: 50%;
-            bottom: 18%;
-            transform: translateX(-50%);
-            z-index: 20;
+            inset: 0;
+            overflow: hidden;
+            background: #0a0a0a;
+        }
+        .feed-frame video.feed-main {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .feed-vignette {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background: linear-gradient(to bottom, transparent 55%, rgba(0,0,0,0.75) 100%);
+        }
+        .feed-right-rail {
+            position: absolute;
+            right: 10px;
+            bottom: 22%;
             display: flex;
             flex-direction: column;
+            gap: 14px;
             align-items: center;
-            gap: 4px;
-            opacity: 0;
+            z-index: 3;
+        }
+        .feed-rail-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.06);
+        }
+        .feed-caption-block {
+            position: absolute;
+            left: 14px;
+            right: 64px;
+            bottom: 12%;
+            z-index: 3;
+            font-family: "SF Pro Text", system-ui, sans-serif;
+            font-size: 13px;
+            line-height: 1.45;
+            color: rgba(255,255,255,0.92);
+            text-shadow: 0 1px 8px rgba(0,0,0,0.8);
+        }
+        .feed-caption-block .feed-user {
+            font-weight: 600;
+            margin-bottom: 4px;
+            font-size: 12px;
+        }
+        .feed-caption-block .feed-eng {
+            margin-top: 8px;
+            font-size: 11px;
+            color: rgba(255,255,255,0.45);
+            letter-spacing: 0.04em;
+        }
+        .comment-tap-layer {
+            position: absolute;
+            inset: 0;
+            z-index: 5;
+            cursor: pointer;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding-bottom: 14%;
+            background: transparent;
+        }
+        .comment-tap-layer .tap-label {
+            font-size: 10px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.5);
             pointer-events: none;
-            animation: s9HintAppear 0.6s ease 1.8s forwards;
         }
-        .s9-scroll-hint svg {
-            width: 22px; height: 22px;
-            fill: none; stroke: rgba(255,255,255,0.6);
-            stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round;
-            animation: s9HintBounce 1.4s ease-in-out infinite;
+
+        /* S5 / S6: slow read pan + pick a side (no manual drag) */
+        .s6-iframe-shell {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+            z-index: 1;
         }
-        .s9-scroll-hint span {
-            font-size: 10px; color: rgba(255,255,255,0.45);
-            letter-spacing: 1px; text-transform: uppercase; font-weight: 500;
+        .s6-iframe-pan {
+            position: relative;
+            width: 100%;
+            height: 268%;
+            transform: translateY(0);
         }
-        @keyframes s9HintAppear { to { opacity: 1; } }
-        @keyframes s9HintBounce {
+        .s6-iframe-pan.s6-iframe-pan-anim {
+            animation: s6SlowPanRead 60s cubic-bezier(0.22, 0.05, 0.22, 1) forwards;
+        }
+        .s6-iframe-pan.s6-auto-paused {
+            animation-play-state: paused;
+        }
+        .s6-iframe-pan .story-iframe {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+            display: block;
+        }
+        @keyframes s6SlowPanRead {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-56%); }
+        }
+        .pick-side-callout {
+            position: absolute;
+            left: 50%;
+            bottom: max(14%, env(safe-area-inset-bottom, 14px));
+            transform: translateX(-50%);
+            z-index: 12;
+            pointer-events: none;
+            opacity: 0;
+            text-align: center;
+            transition: opacity 0.9s ease;
+        }
+        .pick-side-callout.visible {
+            opacity: 1;
+        }
+        .pick-side-pulse {
+            display: inline-block;
+            font-size: 11px;
+            letter-spacing: 0.22em;
+            text-transform: lowercase;
+            color: rgba(255,255,255,0.92);
+            text-shadow: 0 0 20px rgba(0,0,0,0.9);
+            animation: pickSideJump 0.75s ease-in-out infinite;
+        }
+        @keyframes pickSideJump {
             0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(5px); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .feed-tk-iframe {
+            background: #000;
+        }
+
+        /* S17: second closing line fades */
+        .text-content.s14-delayed-fade {
+            opacity: 0;
+            animation: s14DelayedFade 0.9s ease 2s forwards;
+        }
+        .state iframe.story-iframe.s14-delayed-play {
+            opacity: 0;
+            animation: s14DelayedFade 0.9s ease 4s forwards;
+        }
+        @keyframes s14DelayedFade {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .text-content.s12-dim-out {
+            animation: s12DimOut 0.8s ease 2s forwards;
+        }
+        .text-content.s8-dim-out {
+            animation: s8DimOut 1.5s ease 2s forwards;
+        }
+        @keyframes s8DimOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+        @keyframes s12DimOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+        .tightened-red {
+            color: #d84b4b;
+            font-weight: 700;
+            opacity: 0;
+            display: inline-block;
+        }
+        .text-content.s18-delayed-in .tightened-red {
+            animation: s18DelayedIn 0.9s ease 1s forwards;
+        }
+        @keyframes s18DelayedIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
         .s20-audio-shell {
@@ -277,8 +438,8 @@
             position: fixed;
             right: 0;
             bottom: 0;
-            width: min(34vw, 150px);
-            height: min(34vh, 220px);
+            width: min(28vw, 120px);
+            height: min(30vh, 180px);
             z-index: 1600;
             touch-action: none;
             background: transparent;
@@ -319,8 +480,8 @@
             left: 50%;
             transform: translateX(-50%);
             font-size: 12px;
-            letter-spacing: 0.18em;
-            text-transform: lowercase;
+            letter-spacing: 0.14em;
+            text-transform: none;
             color: rgba(255,255,255,0.72);
             opacity: 1;
         }
@@ -440,12 +601,12 @@
     <div class="viewport" id="viewport"></div>
     <div id="finalFade"></div>
     <div id="blackoutOverlay"></div>
-    <div class="state-indicator" id="stateIndicator">01 / 27</div>
+    <div class="state-indicator" id="stateIndicator">01 / 18</div>
     <div class="nav-hint" id="navHint"><span class="arrow">&#709;</span><span class="arrow" style="animation-delay:0.15s">&#709;</span></div>
     <div id="navCornerSwipe" aria-hidden="true"></div>
     <div id="firstGestureHint" aria-hidden="true"><span class="hand-icon" title="">&#x1F446;</span></div>
     <div id="onboardingGuide" aria-hidden="true">
-        <div class="onboard-title" id="onboardTitle">how to read flickfiction</div>
+        <div class="onboard-title" id="onboardTitle">How to Read Flickfiction</div>
         <div class="onboard-step" id="onboardStep1">
             <span class="tap-ring"></span>
             <svg class="onboard-hand hand-drag" viewBox="0 0 24 24" aria-hidden="true">
@@ -457,7 +618,7 @@
                 <path d="M12 3.2v4.3"/>
                 <path d="M9.8 5.4L12 3.2l2.2 2.2"/>
             </svg>
-            <span class="onboard-caption">here to drug</span>
+            <span class="onboard-caption">here to drag</span>
         </div>
         <div class="onboard-step" id="onboardStep2">
             <svg class="onboard-hand hand-down" viewBox="0 0 24 24" aria-hidden="true">
@@ -482,90 +643,59 @@
         var states = [
             { type: 'onboarding', tone: 'tone-rain-open', label: '' },
 
-            { type: 'text', tone: 'tone-rain-open',
-              html: '<p>The rain was still there. Not last night&#39;s violence.<br>This was the rain that lingers: fine, even, patient.<br>As if the sky still hadn&#39;t decided how to end it.</p>' },
-
-            { type: 'video', tone: 'tone-rain-open',
-              label: '[ VIDEO \u2014 S2 \u00b7 city morning montage \u00b7 10s ]',
-              src: 'https://pub-0f8fb9a88fd749b0987b026db4672ab5.r2.dev/lv_0_20260326063834.mp4' },
+            { type: 'ui', tone: 'tone-information',
+              label: '[ UI \u2014 breaking notification \u00b7 daytime ]' },
 
             { type: 'text', tone: 'tone-information',
-              html: '<p>The internet that morning felt like water right before boiling.</p><p class="emphasis">Flat on the surface. Moving underneath.</p>' },
+              html: '<p>By morning, the whole country was scrolling.</p>' },
 
-            { type: 'ui', tone: 'tone-information',
-              label: '[ UI \u2014 S4 \u00b7 breaking push notification ]' },
-
-            { type: 'ui', tone: 'tone-information',
-              label: '[ UI \u2014 S5 \u00b7 short vertical feed ]' },
+            { type: 'feed-iframe', tone: 'tone-information',
+              src: 'https://remi45848-source.github.io/rainshot-ep2/S7.html' },
 
             { type: 'text', tone: 'tone-opinion',
-              html: '<p>The Dalton family: three generations in the Senate.<br>One Vice President. Nearly forty years of influence.</p><p class="emphasis">The law never truly reached them.</p>' },
-
-            { type: 'text', tone: 'tone-opinion',
-              html: '<p class="emphasis">Now someone found another way to finish it.</p>' },
-
-            { type: 'text', tone: 'tone-opinion',
-              html: '<p>Some said: this is justice.</p><p>Some said: this is terror.</p><p>Some said: this has nothing to do with us.</p>' },
+              html: '<p>The Daltons had survived everything.<br>Senate. Vice presidency. Forty years of reach.<br><span class="emphasis">The law had never fully touched them.</span></p>' },
 
             { type: 'ui', tone: 'tone-opinion',
-              label: '[ UI \u2014 S9 \u00b7 comment battlefield ]' },
-
-            { type: 'audio', tone: 'tone-official',
-              label: '[ AUDIO \u2014 S10 \u00b7 broadcast card ]' },
+              label: '[ UI \u2014 comment battlefield ]' },
 
             { type: 'video', tone: 'tone-official',
-              label: '[ VIDEO \u2014 S11 \u00b7 police press conference \u00b7 12-15s ]',
+              label: '[ VIDEO \u2014 official response / press conference ]',
               src: 'https://pub-0f8fb9a88fd749b0987b026db4672ab5.r2.dev/lv_0_20260326072307.mp4' },
 
             { type: 'ui', tone: 'tone-consensus',
-              label: '[ UI \u2014 S12 \u00b7 X live reactions ]' },
+              label: '[ UI — comment feed / pick a side ]' },
 
             { type: 'text', tone: 'tone-consensus',
-              html: '<p><em>&quot;Dogs eating dogs&quot;</em> spread fast that afternoon.</p><p>It was comforting.</p><p>It meant:</p><p class="emphasis">this was theirs, not ours.</p>' },
+              html: '<p>A phrase spread quickly: dogs eating dogs.<br>It comforted people.<br>It meant this was theirs, not ours.</p>' },
 
-            { type: 'text', tone: 'tone-consensus',
-              html: '<p>Only a few people felt something was off.</p><p class="emphasis">No proof. Just the sense that this was not over.</p>' },
-
-            { type: 'ui', tone: 'tone-consensus',
-              label: '[ UI \u2014 S15 \u00b7 X Trending \u00b7 afternoon ]' },
+            { type: 'video', tone: 'tone-strike',
+              label: '[ VIDEO \u2014 rupture clip ]',
+              src: 'https://pub-0f8fb9a88fd749b0987b026db4672ab5.r2.dev/%E5%BE%AE%E4%BF%A1%E8%A7%86%E9%A2%912026-04-16_235107_422.mp4' },
 
             { type: 'text', tone: 'tone-dissolve',
-              html: '<p>Dinnertime. The news was still running.</p><p class="emphasis">No new progress.</p>' },
-
-            { type: 'video', tone: 'tone-dissolve',
-              label: '[ VIDEO \u2014 S17 \u00b7 city evening montage \u00b7 10s ]',
-              src: 'https://pub-0f8fb9a88fd749b0987b026db4672ab5.r2.dev/dreamina_7621328788466453811_1774479204354_m.mp4' },
-
-            { type: 'text', tone: 'tone-dissolve',
-              html: '<p>Most people assumed it would end the usual way:</p><p>a few scapegoats, a few months of noise, then closure.</p>' },
-
-            { type: 'ui', tone: 'tone-dissolve',
-              label: '[ UI \u2014 S19 \u00b7 X Trending \u00b7 late night ]' },
+              html: '<p>By dinner, there was still no progress.</p>' },
 
             { type: 'text', tone: 'tone-midnight',
-              html: '<p><span class="s20-line1">The rain,</span><br><span class="s20-line2">finally,</span><br><span class="s20-line3">had stopped.</span></p>' },
+              html: '<p>At last, the rain had stopped.</p>' },
 
-            { type: 'text', tone: 'tone-midnight',
+            { type: 'video', tone: 'tone-strike',
+              label: '[ VIDEO \u2014 rupture clip 2 ]',
+              src: 'https://pub-0f8fb9a88fd749b0987b026db4672ab5.r2.dev/%E5%BE%AE%E4%BF%A1%E8%A7%86%E9%A2%912026-04-15_225044_829.mp4' },
+
+            { type: 'text', tone: 'tone-strike',
               html: '<p class="emphasis">2:17 AM.</p>' },
 
             { type: 'ui-s32', tone: 'tone-strike',
-              label: '[ UI \u2014 S22 \u00b7 red badge alert \u00b7 vibration ]' },
-
-            { type: 'text', tone: 'tone-strike',
-              html: '<p>People were pulled from sleep by the vibration.</p><p>Eyes half-open, they tapped out of habit.</p><p class="emphasis">Most assumed it was celebrity gossip.</p>' },
+              label: '[ UI \u2014 late-night red badge ]' },
 
             { type: 'ui', tone: 'tone-strike',
-              label: '[ UI \u2014 S24 \u00b7 push lines appear one by one ]' },
-
-            { type: 'video', tone: 'tone-strike',
-              label: '[ VIDEO \u2014 S25 \u00b7 hotel perimeter \u00b7 night \u00b7 10s ]',
-              src: 'https://pub-0f8fb9a88fd749b0987b026db4672ab5.r2.dev/lv_0_20260326072723.mp4' },
+              label: '[ UI \u2014 push lines unfold ]' },
 
             { type: 'text', tone: 'tone-strike',
-              html: '<p class="emphasis">Within one day, a second figure had fallen.</p>' },
+              html: '<p>Within one day, a second figure had fallen.</p>' },
 
             { type: 'text', tone: 'tone-strike',
-              html: '<p class="emphasis"><span class="s27-line1">The nerves of an entire country</span><br><span class="s27-line2">tightened again.</span></p>' }
+              html: '<p><span class="tightened-red">The nerves of an entire country tightened again.</span></p>' }
         ];
 
         var TOTAL = states.length;
@@ -575,12 +705,12 @@
         var scrollCooldown = false;
         var blackoutLock = false;
         var firstHintTimer = null;
-        var pendingS13AutoNext = false;
         var SWIPE_COOLDOWN_MS = 650;
         var onboardingStep = 0;
         var onboardingDone = false;
         var onboardingStep2ReadyAt = 0;
         var onboardingLastInputAt = 0;
+        var s5Drag = { enabled: false, active: false, panEl: null, startY: 0, startTranslate: 0 };
 
         function showOnboardingStep1() {
             if (onboardingDone) return;
@@ -639,15 +769,11 @@
         }
 
         var interactiveIframes = {
-            4:  'https://remi45848-source.github.io/rainshot-ep2/S4.html',
-            5:  'https://remi45848-source.github.io/rainshot-ep2/S7.html',
-            9:  'https://remi45848-source.github.io/rainshot-ep2/S11.html',
-            10: 'https://remi45848-source.github.io/rainshot-ep2/S13.html',
-            12: 'https://remi45848-source.github.io/rainshot-ep2/S17.html',
-            15: 'https://remi45848-source.github.io/rainshot-ep2/S19.html',
-            19: 'https://remi45848-source.github.io/rainshot-ep2/S22.html',
-            22: 'https://remi45848-source.github.io/rainshot-ep2/S32.html',
-            24: 'https://remi45848-source.github.io/rainshot-ep2/S34.html'
+            1:  'https://remi45848-source.github.io/rainshot-ep2/S4.html',
+            5:  'https://remi45848-source.github.io/rainshot-ep2/S11.html',
+            7:  'https://remi45848-source.github.io/rainshot-ep2/S17.html',
+            14: 'https://remi45848-source.github.io/rainshot-ep2/S32.html',
+            15: 'https://remi45848-source.github.io/rainshot-ep2/S34.html'
         };
 
         function buildStateElement(index, state) {
@@ -659,6 +785,8 @@
 
             if (state.type === 'text') {
                 inner += '<div class="text-content">' + state.html + '</div>';
+            } else if (state.type === 'feed-iframe') {
+                inner += '<iframe class="story-iframe feed-tk-iframe" data-src="' + state.src + '" src="about:blank" title="tk-feed" allow="autoplay *; fullscreen *"></iframe>';
             } else if (state.type === 'video') {
                 if (state.src) {
                     inner += '<video class="story-video" playsinline webkit-playsinline preload="auto" src="' + state.src + '"></video>';
@@ -677,7 +805,14 @@
                          '</div>';
             } else if (state.type === 'ui' || state.type === 'ui-s32') {
                 if (interactiveIframes.hasOwnProperty(index)) {
-                    inner += '<iframe class="story-iframe" data-src="' + interactiveIframes[index] + '" src="about:blank" title="story-ui"></iframe>';
+                    if (index === 5) {
+                        inner += '<div class="s6-iframe-shell"><div class="s6-iframe-pan">' +
+                            '<iframe class="story-iframe" data-src="' + interactiveIframes[index] + '" src="about:blank" title="story-ui"></iframe>' +
+                            '</div></div>' +
+                            '<div class="pick-side-callout" aria-hidden="true"><span class="pick-side-pulse">pick a side</span></div>';
+                    } else {
+                        inner += '<iframe class="story-iframe" data-src="' + interactiveIframes[index] + '" src="about:blank" title="story-ui"></iframe>';
+                    }
                 } else {
                     inner += '<div class="ui-placeholder-container">' +
                              '<div class="ui-placeholder-label">' + state.label + '</div>' +
@@ -792,6 +927,25 @@
                 setTimeout(function() { scrollCooldown = false; }, SWIPE_COOLDOWN_MS);
             }, { passive: true });
 
+            window.addEventListener('touchstart', function(e) {
+                if (currentIndex !== 5 || !s5Drag.enabled || !s5Drag.panEl) return;
+                s5Drag.active = true;
+                s5Drag.startY = e.touches[0].clientY;
+                s5Drag.startTranslate = getTranslateYPx(s5Drag.panEl);
+            }, { passive: true });
+            window.addEventListener('touchmove', function(e) {
+                if (currentIndex !== 5 || !s5Drag.enabled || !s5Drag.active || !s5Drag.panEl) return;
+                var dy = e.touches[0].clientY - s5Drag.startY;
+                var next = s5Drag.startTranslate + dy;
+                var minY = Math.min(0, window.innerHeight - s5Drag.panEl.offsetHeight);
+                if (next < minY) next = minY;
+                if (next > 0) next = 0;
+                s5Drag.panEl.style.transform = 'translateY(' + next + 'px)';
+            }, { passive: true });
+            window.addEventListener('touchend', function() {
+                if (s5Drag.active) s5Drag.active = false;
+            }, { passive: true });
+
             function handleOnboardingTap() {
                 if (currentIndex !== 0) return;
                 var now = Date.now();
@@ -834,11 +988,13 @@
             window.addEventListener('message', function (event) {
                 var data = event.data;
                 if (!data || typeof data !== 'object') return;
-                if (data.type !== 'S13_AUDIO_ENDED') return;
-                if (!pendingS13AutoNext) return;
-                pendingS13AutoNext = false;
-                gotoState(currentIndex + 1);
+                if (data.type === 'EP2_S3_FEED_DONE' && currentIndex === 3) {
+                    setTimeout(function () {
+                        if (currentIndex === 3) gotoState(4);
+                    }, 0);
+                }
             });
+
         }
 
         function focusStoryShell() {
@@ -851,7 +1007,7 @@
         }
 
         function shouldRestartIframe(index) {
-            return index === 4 || index === 10 || index === 12 || index === 15 || index === 19 || index === 22 || index === 24;
+            return index === 1 || index === 3 || index === 5 || index === 7 || index === 14 || index === 15;
         }
 
         function primeActiveIframe(index, activeEl) {
@@ -878,6 +1034,8 @@
         }
 
         var preloadedVideoMap = {};
+        var preloadedDocMap = {};
+        var preconnectedOriginMap = {};
         function preloadUpcomingVideos(currentIndex) {
             var loaded = 0;
             for (var i = currentIndex + 1; i < TOTAL && loaded < 3; i++) {
@@ -893,6 +1051,63 @@
             }
         }
 
+        function preconnectOriginFor(url) {
+            try {
+                var u = new URL(url, location.href);
+                if (preconnectedOriginMap[u.origin]) return;
+                preconnectedOriginMap[u.origin] = true;
+                var l1 = document.createElement('link');
+                l1.rel = 'preconnect';
+                l1.href = u.origin;
+                l1.crossOrigin = 'anonymous';
+                document.head.appendChild(l1);
+                var l2 = document.createElement('link');
+                l2.rel = 'dns-prefetch';
+                l2.href = u.origin;
+                document.head.appendChild(l2);
+            } catch (e) {}
+        }
+
+        function prefetchDocument(url) {
+            if (!url || preloadedDocMap[url]) return;
+            preloadedDocMap[url] = true;
+            preconnectOriginFor(url);
+            try {
+                var l = document.createElement('link');
+                l.rel = 'prefetch';
+                l.as = 'document';
+                l.href = url;
+                document.head.appendChild(l);
+            } catch (e) {}
+        }
+
+        function preloadUpcomingEmbeddedDocs(currentIndex) {
+            for (var i = currentIndex + 1; i < TOTAL && i <= currentIndex + 3; i++) {
+                var st = states[i];
+                if (!st) continue;
+                if (st.type === 'feed-iframe' && st.src) {
+                    prefetchDocument(st.src);
+                }
+            }
+        }
+
+        function getTranslateYPx(el) {
+            if (!el) return 0;
+            var tr = window.getComputedStyle(el).transform;
+            if (!tr || tr === 'none') return 0;
+            var m = tr.match(/matrix\(([^)]+)\)/);
+            if (m && m[1]) {
+                var parts = m[1].split(',');
+                return parseFloat(parts[5]) || 0;
+            }
+            var m3 = tr.match(/matrix3d\(([^)]+)\)/);
+            if (m3 && m3[1]) {
+                var p3 = m3[1].split(',');
+                return parseFloat(p3[13]) || 0;
+            }
+            return 0;
+        }
+
         function startActiveVideo(index, activeEl) {
             if (!activeEl) return false;
             var video = activeEl.querySelector('video.story-video');
@@ -900,7 +1115,7 @@
             try {
                 video.pause();
                 video.currentTime = 0;
-                video.muted = (index === 17);
+                video.muted = false;
                 video.autoplay = true;
                 video.onended = function () {
                     if (currentIndex === index) gotoState(index + 1);
@@ -949,40 +1164,59 @@
             activeEl.classList.add('active');
             if (index !== 0) hideOnboardingGuide();
             primeActiveIframe(index, activeEl);
-            if (index === 9) {
-                var s9Frame = activeEl.querySelector('iframe.story-iframe');
-                if (s9Frame) {
-                    s9Frame.classList.remove('s9-fade-in');
-                    setTimeout(function () { s9Frame.classList.add('s9-fade-in'); }, 20);
-                }
-                var oldHint9 = activeEl.querySelector('.s9-scroll-hint');
-                if (oldHint9) oldHint9.remove();
-                var scrollHint9 = document.createElement('div');
-                scrollHint9.className = 's9-scroll-hint';
-                scrollHint9.innerHTML = '<svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg><span>scroll</span>';
-                activeEl.appendChild(scrollHint9);
-            }
+
             var activeText = activeEl.querySelector('.text-content');
             if (activeText) activeText.classList.remove('s31-fade-in');
             if (activeText) activeText.classList.remove('s21-delayed-fade');
             if (activeText) activeText.classList.remove('s20-dim-after');
+            if (activeText) activeText.classList.remove('s14-delayed-fade');
+            if (activeText) activeText.classList.remove('s12-dim-out');
+            if (activeText) activeText.classList.remove('s8-dim-out');
+            if (activeText) activeText.classList.remove('s18-delayed-in');
             var animSpans = activeEl.querySelectorAll('.anim');
             for (var a = 0; a < animSpans.length; a++) animSpans[a].classList.remove('anim');
             var activeVideoEl = activeEl.querySelector('video.story-video');
             if (activeVideoEl) activeVideoEl.classList.remove('s11-delayed-fade');
-            if (index === 11 && activeVideoEl) {
-                setTimeout(function () { activeVideoEl.classList.add('s11-delayed-fade'); }, 20);
+            if (activeVideoEl) activeVideoEl.classList.remove('s13-delayed-fade');
+            var activeIframeEl = activeEl.querySelector('iframe.story-iframe');
+            if (activeIframeEl) activeIframeEl.classList.remove('s14-delayed-play');
+            s5Drag.enabled = false;
+            s5Drag.panEl = null;
+            s5Drag.active = false;
+
+            if (index === 5) {
+                var panEl = activeEl.querySelector('.s6-iframe-pan');
+                var pickEl = activeEl.querySelector('.pick-side-callout');
+                if (pickEl) pickEl.classList.remove('visible');
+                if (panEl) {
+                    panEl.style.transform = '';
+                    panEl.classList.remove('s6-auto-paused');
+                    panEl.classList.remove('s6-iframe-pan-anim');
+                    void panEl.offsetWidth;
+                    panEl.classList.add('s6-iframe-pan-anim');
+                }
+                setTimeout(function () {
+                    if (currentIndex === 5 && pickEl && panEl) {
+                        pickEl.classList.add('visible');
+                        var currentY = getTranslateYPx(panEl);
+                        panEl.classList.add('s6-auto-paused');
+                        panEl.classList.remove('s6-iframe-pan-anim');
+                        panEl.style.transform = 'translateY(' + currentY + 'px)';
+                        s5Drag.enabled = true;
+                        s5Drag.panEl = panEl;
+                    }
+                }, 42000);
             }
 
             currentIndex = index;
             preloadUpcomingVideos(index);
+            preloadUpcomingEmbeddedDocs(index);
             var displayNumber = (index + 1);
             document.getElementById('stateIndicator').innerText =
                 (displayNumber < 10 ? '0' : '') + displayNumber + ' / ' + TOTAL;
 
             var state = states[index];
             updateFirstGestureHint(index);
-            pendingS13AutoNext = false;
 
             if (state.type === 'onboarding') {
                 showOnboardingStep1();
@@ -991,27 +1225,16 @@
             }
 
             if (state.type === 'text') {
-                if (index === 20 && activeText) {
-                    var l1 = activeText.querySelector('.s20-line1');
-                    var l2 = activeText.querySelector('.s20-line2');
-                    var l3 = activeText.querySelector('.s20-line3');
-                    if (l1) { l1.classList.remove('anim'); void l1.offsetWidth; l1.classList.add('anim'); }
-                    if (l2) { l2.classList.remove('anim'); void l2.offsetWidth; l2.classList.add('anim'); }
-                    if (l3) { l3.classList.remove('anim'); void l3.offsetWidth; l3.classList.add('anim'); }
-                    activeText.classList.add('s20-dim-after');
+                if (index === 11 && activeText) {
+                    activeText.classList.add('s8-dim-out');
                     autoTimer = setTimeout(function() {
-                        if (currentIndex === 20) gotoState(21);
-                    }, 6400);
+                        if (currentIndex === 11) gotoState(12);
+                    }, 3500);
                 }
-                if (index === 21 && activeText) {
-                    activeText.classList.add('s21-delayed-fade');
-                }
-                if (index === TOTAL - 1) {
-                    var a1 = activeText.querySelector('.s27-line1');
-                    var a2 = activeText.querySelector('.s27-line2');
-                    if (a1) { a1.classList.remove('anim'); void a1.offsetWidth; a1.classList.add('anim'); }
-                    if (a2) { a2.classList.remove('anim'); void a2.offsetWidth; a2.classList.add('anim'); }
+                if (index === 17) {
+                    if (activeText) activeText.classList.add('s18-delayed-in');
                     setTimeout(function() {
+                        if (currentIndex !== 17) return;
                         document.getElementById('finalFade').classList.add('active');
                         var fadeSteps = 20;
                         var step = 0;
@@ -1023,34 +1246,53 @@
                                 ambientAudio.pause();
                             }
                         }, 100);
-                    }, 4500);
-                } else {
+                    }, 5200);
+                } else if (index !== 11) {
                     setTimeout(function() { hint.classList.add('visible'); }, 1200);
                 }
                 setTimeout(function() { isTransitioning = false; }, 800);
                 return;
             }
 
+            if (state.type === 'feed-iframe') {
+                setTimeout(function() { hint.classList.add('visible'); }, 1200);
+                setTimeout(function() { isTransitioning = false; }, 800);
+                setTimeout(focusStoryShell, 200);
+                return;
+            }
+
             if (state.type === 'video') {
                 setTimeout(function() { isTransitioning = false; }, 800);
-                if (index === 11) {
-                    setTimeout(function () {
-                        if (currentIndex === 11) startActiveVideo(index, activeEl);
-                    }, 2000);
-                    return;
-                }
-                if (index === 17) {
-                    startActiveVideo(index, activeEl);
-                    var s17bgAudio = new Audio('https://pub-0f8fb9a88fd749b0987b026db4672ab5.r2.dev/town_cross_roads2.mp3');
-                    s17bgAudio.volume = 0.15;
-                    s17bgAudio.loop = true;
-                    s17bgAudio.play().catch(function(){});
-                    var origOnEnded = activeEl.querySelector('video.story-video').onended;
-                    activeEl.querySelector('video.story-video').onended = function () {
-                        s17bgAudio.pause();
-                        s17bgAudio.src = '';
-                        if (origOnEnded) origOnEnded();
-                    };
+                if (index === 12) {
+                    var vR = activeEl.querySelector('video.story-video');
+                    if (vR) {
+                        var ruptureDone = false;
+                        function finishRupture() {
+                            if (ruptureDone || currentIndex !== 12) return;
+                            ruptureDone = true;
+                            if (autoTimer) { clearTimeout(autoTimer); autoTimer = null; }
+                            gotoState(13);
+                        }
+                        try {
+                            vR.pause();
+                            vR.currentTime = 0;
+                            vR.muted = false;
+                            vR.autoplay = true;
+                            vR.onended = finishRupture;
+                            vR.classList.add('s13-delayed-fade');
+                            autoTimer = setTimeout(function () {
+                                if (currentIndex !== 12) return;
+                                vR.play().catch(function () {});
+                            }, 2000);
+                            setTimeout(function () {
+                                if (currentIndex === 12 && !ruptureDone) {
+                                    autoTimer = setTimeout(finishRupture, 12000);
+                                }
+                            }, 2400);
+                        } catch (err) {
+                            autoTimer = setTimeout(finishRupture, 4500);
+                        }
+                    }
                     return;
                 }
                 if (!startActiveVideo(index, activeEl)) {
@@ -1061,19 +1303,11 @@
                 return;
             }
 
-            if (state.type === 'audio') {
-                if (index === 10) {
-                    playBell(0.9);
-                }
-                pendingS13AutoNext = true;
-                setTimeout(function() { hint.classList.add('visible'); }, 1200);
-                setTimeout(function() { isTransitioning = false; }, 800);
-                setTimeout(focusStoryShell, 200);
-                return;
-            }
-
             if (state.type === 'ui') {
-                if (index === 4) playBell(0.9);
+                if (index === 1) playBell(0.9);
+                if (index === 15 && activeIframeEl) {
+                    activeIframeEl.classList.add('s14-delayed-play');
+                }
                 setTimeout(function() { hint.classList.add('visible'); }, 1200);
                 setTimeout(function() { isTransitioning = false; }, 800);
                 setTimeout(focusStoryShell, 200);
