@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Rainshot — Episode 2 · Who Killed the Daltons?</title>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://files.catbox.moe" crossorigin>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body {
@@ -296,9 +297,11 @@
 
     var ambientAudio = new Audio('https://files.catbox.moe/jn29tb.mp3');
     ambientAudio.loop = true;
+    ambientAudio.preload = 'auto';
     var AMBIENT_BASE_VOLUME = 0.135;
     ambientAudio.volume = AMBIENT_BASE_VOLUME;
     var ambientStarted = false;
+    try { ambientAudio.load(); } catch (e) {}
 
     var alertBellUrl = 'https://pub-0f8fb9a88fd749b0987b026db4672ab5.r2.dev/iPhone%E7%9F%AD%E4%BF%A1%E9%93%83%E5%A3%B0_%E7%88%B1%E7%BB%99%E7%BD%91_aigei_com.mp3';
 
@@ -312,12 +315,25 @@
     }
 
     function startAmbient() {
-      if (ambientStarted) return;
-      ambientStarted = true;
+      if (ambientStarted && !ambientAudio.paused) return;
       try {
         ambientAudio.volume = AMBIENT_BASE_VOLUME;
-        ambientAudio.play().catch(function () {});
-      } catch (e) {}
+        var p = ambientAudio.play();
+        if (p && typeof p.then === 'function') {
+          p.then(function () { ambientStarted = true; }).catch(function () {
+            ambientStarted = false;
+          });
+        } else {
+          ambientStarted = true;
+        }
+      } catch (e) {
+        ambientStarted = false;
+      }
+    }
+
+    function ensureAmbientPlaying() {
+      if (!experienceStarted) return;
+      if (!ambientStarted || ambientAudio.paused) startAmbient();
     }
 
     function fadeAmbientOut() {
@@ -622,11 +638,19 @@
         }
       });
 
-      document.getElementById('startButton').addEventListener('click', startExperience);
-      document.getElementById('startButton').addEventListener('touchend', function (e) {
+      document.getElementById('startButton').addEventListener('touchstart', function () {
+        /* iOS 必须在 touchstart 同步链里 unlock 音频 */
+        startAmbient();
+      }, { passive: true });
+      document.getElementById('startButton').addEventListener('click', function (e) {
         e.preventDefault();
+        startAmbient();
         startExperience();
       });
+
+      window.addEventListener('touchstart', function () {
+        ensureAmbientPlaying();
+      }, { passive: true });
 
       window.addEventListener('message', function (event) {
         var data = event.data;
@@ -647,6 +671,7 @@
       });
 
       window.addEventListener('wheel', function (e) {
+        ensureAmbientPlaying();
         if (!experienceStarted) return;
         if (scrollCooldown || isTransitioning) return;
         scrollCooldown = true;
@@ -660,6 +685,7 @@
         touchStartY = e.touches[0].clientY;
       }, { passive: true });
       window.addEventListener('touchend', function (e) {
+        ensureAmbientPlaying();
         if (!experienceStarted) return;
         if (scrollCooldown || isTransitioning) return;
         var diff = touchStartY - e.changedTouches[0].clientY;
