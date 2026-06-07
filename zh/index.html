@@ -1,1421 +1,685 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Rainshot — Episode 2</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body { width: 100%; height: 100%; overflow: hidden; -webkit-font-smoothing: antialiased; }
-        body { font-family: 'Cormorant Garamond', 'Georgia', serif; background: #0a0a0a; color: #e8e8e8; font-weight: 300; }
-        body:focus { outline: none; }
-        #startOverlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.98);
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            z-index: 10000; opacity: 1; transition: opacity 0.8s ease;
-        }
-        #startOverlay.hidden { opacity: 0; pointer-events: none; }
-        #startButton {
-            padding: 20px 50px; font-size: 1.3em; font-family: 'Cormorant Garamond', serif; font-weight: 300;
-            letter-spacing: 3px; background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.3); color: #fff; cursor: pointer;
-            border-radius: 2px; transition: all 0.4s ease; display: none;
-        }
-        #startButton:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.5); }
-        .access-gate { display: flex; flex-direction: column; align-items: center; gap: 16px; }
-        .access-label { font-size: 0.85em; letter-spacing: 3px; color: rgba(255,255,255,0.35); text-transform: uppercase; }
-        .access-input {
-            width: 240px; padding: 14px 20px; font-size: 1.1em; font-family: 'Cormorant Garamond', serif;
-            font-weight: 300; letter-spacing: 2px; text-align: center;
-            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.15);
-            color: #fff; border-radius: 2px; outline: none; transition: all 0.4s ease;
-        }
-        .access-input::placeholder { color: rgba(255,255,255,0.2); }
-        .access-input:focus { border-color: rgba(255,255,255,0.4); background: rgba(255,255,255,0.06); }
-        .access-input.error { border-color: rgba(200,60,60,0.6); animation: accessShake 0.4s ease; }
-        .access-error { font-size: 0.8em; color: rgba(200,60,60,0.7); letter-spacing: 2px; height: 1em; }
-        @keyframes accessShake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Rainshot — Episode 2 · Who Killed the Daltons?</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      width: 100%; height: 100%; overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+    body {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      background: #0a0a0a; color: #e8e8e8; font-weight: 300;
+    }
+    body:focus { outline: none; }
 
-        .viewport { position: fixed; top: 0; left: 0; width: 100%; height: 100%; }
-        .state {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            min-height: 100%;
-            min-height: -webkit-fill-available;
-            opacity: 0; visibility: hidden;
-            transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex; align-items: center; justify-content: center;
-        }
-        .state.active { opacity: 1; visibility: visible; pointer-events: auto; }
-        .state iframe.story-iframe {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            min-height: 100%;
-            border: 0;
-            z-index: 1;
-            display: block;
-        }
+    #startOverlay {
+      position: fixed; inset: 0;
+      background: rgba(0, 0, 0, 0.98);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      z-index: 10000; opacity: 1;
+      transition: opacity 0.8s ease;
+    }
+    #startOverlay.hidden { opacity: 0; pointer-events: none; }
+    #startButton {
+      padding: 20px 50px; font-size: 1.3em; font-family: 'Cormorant Garamond', serif; font-weight: 300;
+      letter-spacing: 3px; background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.3); color: #fff; cursor: pointer;
+      border-radius: 2px; transition: all 0.4s ease; display: none;
+    }
+    #startButton:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.5); }
+    .access-gate { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+    .access-label { font-size: 0.85em; letter-spacing: 3px; color: rgba(255,255,255,0.35); text-transform: uppercase; }
+    .access-input {
+      width: 240px; padding: 14px 20px; font-size: 1.1em; font-family: 'Cormorant Garamond', serif;
+      font-weight: 300; letter-spacing: 2px; text-align: center;
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.15);
+      color: #fff; border-radius: 2px; outline: none; transition: all 0.4s ease;
+    }
+    .access-input::placeholder { color: rgba(255,255,255,0.2); }
+    .access-input:focus { border-color: rgba(255,255,255,0.4); background: rgba(255,255,255,0.06); }
+    .access-input.error { border-color: rgba(200,60,60,0.6); animation: accessShake 0.4s ease; }
+    .access-error { font-size: 0.8em; color: rgba(200,60,60,0.7); letter-spacing: 2px; height: 1em; }
+    @keyframes accessShake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-6px); }
+      75% { transform: translateX(6px); }
+    }
 
-        .bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
-        .text-content {
-            font-size: 1.35em; line-height: 2.4; letter-spacing: 0.04em;
-            text-align: center; max-width: 85%; padding: 40px;
-        }
-        .text-content .emphasis { font-weight: 500; color: #fff; }
-        .text-content.s31-fade-in { animation: s31FadeIn 4s ease forwards; }
-        .text-content.s21-delayed-fade {
-            opacity: 0;
-            animation: s21DelayedFade 2.4s ease 1.5s forwards;
-        }
-        @keyframes s21DelayedFade {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        .s20-line1, .s20-line2, .s20-line3 { opacity: 0; }
-        .s20-line1.anim { animation: s20FadeIn 0.8s ease forwards; }
-        .s20-line2.anim { animation: s20FadeIn 0.8s ease 1.2s forwards; }
-        .s20-line3.anim { animation: s20FadeIn 0.8s ease 2.4s forwards; }
-        .text-content.s20-dim-after { animation: s20DimAfter 1.5s ease 4.7s forwards; }
-        @keyframes s20FadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes s20DimAfter { from { opacity: 1; } to { opacity: 0; } }
-        @keyframes s31FadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
+    .viewport { position: fixed; inset: 0; }
+    .state {
+      position: absolute; inset: 0;
+      min-height: 100%;
+      min-height: -webkit-fill-available;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .state.active {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
 
-        /* Tone palette (Episode 2) */
-        .tone-rain-open      { background: #09090e; }
-        .tone-information    { background: #08080d; }
-        .tone-opinion        { background: #0a0a0c; }
-        .tone-official       { background: #080c10; }
-        .tone-consensus      { background: #0c0a08; }
-        .tone-dissolve       { background: #0b0b0a; }
-        .tone-midnight       { background: #060608; }
-        .tone-strike         { background: #040404; }
+    .tone-rain-open   { background: #09090e; }
+    .tone-information { background: #08080d; }
+    .tone-opinion     { background: #0a0a0c; }
+    .tone-official    { background: #080c10; }
+    .tone-consensus   { background: #0c0a08; }
+    .tone-dissolve    { background: #0b0b0a; }
+    .tone-midnight    { background: #060608; }
+    .tone-strike      { background: #040404; }
 
-        .video-placeholder-rect {
-            width: 100%; height: 100%;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .state video.story-video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-            background: #000;
-        }
-        .state video.story-video.s11-delayed-fade {
-            opacity: 0;
-            animation: s11DelayedFade 1.5s ease 2s forwards;
-        }
-        .state video.story-video.s13-delayed-fade {
-            opacity: 0;
-            animation: s13DelayedFade 0.6s ease 2s forwards;
-        }
-        @keyframes s11DelayedFade {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        @keyframes s13DelayedFade {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        .s27-line1, .s27-line2 { opacity: 0; }
-        .s27-line1.anim { animation: s20FadeIn 1s ease forwards; }
-        .s27-line2.anim { animation: s20FadeIn 1s ease 2s forwards; }
-        .video-placeholder-label,
-        .ui-placeholder-label,
-        .audio-placeholder-label {
-            font-family: "SF Mono","Fira Code","Fira Mono","Roboto Mono","Courier New",monospace;
-            font-size: 0.8em;
-            letter-spacing: 0.18em;
-            text-transform: uppercase;
-            color: rgba(255,255,255,0.15);
-        }
+    .text {
+      width: min(90vw, 900px);
+      text-align: center;
+      line-height: 2.4;
+      letter-spacing: 0.04em;
+      font-size: clamp(18px, 2.2vw, 28px);
+      padding: 40px;
+    }
+    .text p { margin: 10px 0; }
+    .emphasis { color: #fff; font-weight: 500; }
 
-        .ui-placeholder-container {
-            display: flex; align-items: center; justify-content: center;
-            width: 100%; height: 100%;
-        }
-        .state iframe.story-iframe.s9-fade-in {
-            animation: s9FadeIn 1.1s ease both;
-        }
-        @keyframes s9FadeIn {
-            from { opacity: 0; transform: scale(0.98); }
-            to { opacity: 1; transform: scale(1); }
-        }
-        /* TikTok-like narrative feed (S3 autoplay, no between-clip gestures) */
-        .feed-frame {
-            position: absolute;
-            inset: 0;
-            overflow: hidden;
-            background: #0a0a0a;
-        }
-        .feed-frame video.feed-main {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-        .feed-vignette {
-            position: absolute;
-            inset: 0;
-            pointer-events: none;
-            background: linear-gradient(to bottom, transparent 55%, rgba(0,0,0,0.75) 100%);
-        }
-        .feed-right-rail {
-            position: absolute;
-            right: 10px;
-            bottom: 22%;
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-            align-items: center;
-            z-index: 3;
-        }
-        .feed-rail-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 10px;
-            border: 1px solid rgba(255,255,255,0.2);
-            background: rgba(255,255,255,0.06);
-        }
-        .feed-caption-block {
-            position: absolute;
-            left: 14px;
-            right: 64px;
-            bottom: 12%;
-            z-index: 3;
-            font-family: "SF Pro Text", system-ui, sans-serif;
-            font-size: 13px;
-            line-height: 1.45;
-            color: rgba(255,255,255,0.92);
-            text-shadow: 0 1px 8px rgba(0,0,0,0.8);
-        }
-        .feed-caption-block .feed-user {
-            font-weight: 600;
-            margin-bottom: 4px;
-            font-size: 12px;
-        }
-        .feed-caption-block .feed-eng {
-            margin-top: 8px;
-            font-size: 11px;
-            color: rgba(255,255,255,0.45);
-            letter-spacing: 0.04em;
-        }
-        .comment-tap-layer {
-            position: absolute;
-            inset: 0;
-            z-index: 5;
-            cursor: pointer;
-            display: flex;
-            align-items: flex-end;
-            justify-content: center;
-            padding-bottom: 14%;
-            background: transparent;
-        }
-        .comment-tap-layer .tap-label {
-            font-size: 10px;
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-            color: rgba(255,255,255,0.5);
-            pointer-events: none;
-        }
+    .text.s31-fade-in { animation: s31FadeIn 4s ease forwards; }
+    @keyframes s31FadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
 
-        /* S5 / S6: slow read pan + pick a side (no manual drag) */
-        .s6-iframe-shell {
-            position: absolute;
-            inset: 0;
-            overflow: hidden;
-            z-index: 1;
-        }
-        .s6-iframe-pan {
-            position: relative;
-            width: 100%;
-            height: 268%;
-            transform: translateY(0);
-        }
-        .s6-iframe-pan.s6-iframe-pan-anim {
-            animation: s6SlowPanRead 60s cubic-bezier(0.22, 0.05, 0.22, 1) forwards;
-        }
-        .s6-iframe-pan.s6-auto-paused {
-            animation-play-state: paused;
-        }
-        .s6-iframe-pan .story-iframe {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            border: 0;
-            display: block;
-        }
-        @keyframes s6SlowPanRead {
-            0% { transform: translateY(0); }
-            100% { transform: translateY(-56%); }
-        }
-        .pick-side-callout {
-            position: absolute;
-            left: 50%;
-            bottom: max(14%, env(safe-area-inset-bottom, 14px));
-            transform: translateX(-50%);
-            z-index: 12;
-            pointer-events: none;
-            opacity: 0;
-            text-align: center;
-            transition: opacity 0.9s ease;
-        }
-        .pick-side-callout.visible {
-            opacity: 1;
-        }
-        .s6-drag-layer {
-            position: absolute;
-            inset: 0;
-            z-index: 11;
-            pointer-events: none;
-            background: transparent;
-        }
-        .s6-drag-layer.enabled {
-            pointer-events: auto;
-            touch-action: none;
-        }
-        /* S1: cross-origin iframe 不冒泡 touch，用透明层承接整屏上下滑切换 */
-        .s1-nav-layer {
-            position: absolute;
-            inset: 0;
-            z-index: 2;
-            background: transparent;
-            touch-action: none;
-            pointer-events: auto;
-        }
-        .pick-side-pulse {
-            display: inline-block;
-            font-size: 11px;
-            letter-spacing: 0.22em;
-            text-transform: lowercase;
-            color: rgba(255,255,255,0.92);
-            text-shadow: 0 0 20px rgba(0,0,0,0.9);
-            animation: pickSideJump 0.75s ease-in-out infinite;
-        }
-        @keyframes pickSideJump {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-5px); }
-        }
+    .video-shell, .ui-shell {
+      position: absolute;
+      inset: 0;
+      background: #000;
+    }
 
-        .feed-tk-iframe {
-            background: #000;
-        }
+    video.story-video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      background: #000;
+    }
+    video.story-video.s13-delayed-fade {
+      opacity: 0;
+      animation: s13DelayedFade 0.6s ease 2s forwards;
+    }
+    @keyframes s13DelayedFade {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
 
-        /* S17: second closing line fades */
-        .text-content.s14-delayed-fade {
-            opacity: 0;
-            animation: s14DelayedFade 0.9s ease 2s forwards;
-        }
-        .state iframe.story-iframe.s14-delayed-play {
-            opacity: 0;
-            animation: s14DelayedFade 0.9s ease 4s forwards;
-        }
-        @keyframes s14DelayedFade {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        .text-content.s12-dim-out {
-            animation: s12DimOut 0.8s ease 2s forwards;
-        }
-        .text-content.s8-dim-out {
-            animation: s8DimOut 1.5s ease 2s forwards;
-        }
-        @keyframes s8DimOut {
-            from { opacity: 1; }
-            to { opacity: 0; }
-        }
-        @keyframes s12DimOut {
-            from { opacity: 1; }
-            to { opacity: 0; }
-        }
-        .tightened-red {
-            color: #d84b4b;
-            font-weight: 700;
-            opacity: 0;
-            display: inline-block;
-        }
-        .text-content.s18-delayed-in .tightened-red {
-            animation: s18DelayedIn 0.9s ease 1s forwards;
-        }
-        @keyframes s18DelayedIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
+    iframe.story-iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      min-height: 100%;
+      border: 0;
+      display: block;
+      background: #000;
+    }
+    iframe.story-iframe.s9-fade-in {
+      animation: s9FadeIn 1.1s ease both;
+    }
+    @keyframes s9FadeIn {
+      from { opacity: 0; transform: scale(0.98); }
+      to { opacity: 1; transform: scale(1); }
+    }
 
-        .s20-audio-shell {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-        }
-        .s20-audio-card {
-            width: min(86vw, 560px);
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            border-radius: 14px;
-            padding: 16px 18px;
-            background: linear-gradient(160deg, rgba(32, 32, 38, 0.92), rgba(8, 8, 11, 0.95));
-            transform: translateY(36vh);
-            opacity: 0;
-            animation: s20JumpIn 0.8s cubic-bezier(0.2, 1, 0.35, 1) forwards;
-        }
-        .s20-title {
-            font-size: 12px;
-            letter-spacing: 0.14em;
-            text-transform: uppercase;
-            color: rgba(255, 255, 255, 0.56);
-            margin-bottom: 12px;
-        }
-        .s20-bars {
-            display: flex;
-            align-items: flex-end;
-            gap: 6px;
-            height: 34px;
-            margin-bottom: 10px;
-        }
-        .s20-bars span {
-            width: 4px;
-            height: 10px;
-            background: rgba(255, 255, 255, 0.75);
-            border-radius: 3px;
-            animation: s20Bars 1.1s ease-in-out infinite;
-        }
-        .s20-bars span:nth-child(2) { animation-delay: 0.08s; }
-        .s20-bars span:nth-child(3) { animation-delay: 0.16s; }
-        .s20-bars span:nth-child(4) { animation-delay: 0.24s; }
-        .s20-bars span:nth-child(5) { animation-delay: 0.32s; }
-        .s20-sub {
-            font-family: "SF Mono","Fira Code","Roboto Mono","Courier New",monospace;
-            font-size: 11px;
-            letter-spacing: 0.1em;
-            color: rgba(255, 255, 255, 0.42);
-        }
-        @keyframes s20JumpIn {
-            0% { opacity: 0; transform: translateY(36vh); }
-            72% { opacity: 1; transform: translateY(-18vh); }
-            100% { opacity: 1; transform: translateY(-14vh); }
-        }
-        @keyframes s20Bars {
-            0%, 100% { height: 8px; opacity: 0.55; }
-            50% { height: 30px; opacity: 1; }
-        }
+    .placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(255,255,255,0.15);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      text-align: center;
+      padding: 20px;
+    }
 
-        .audio-placeholder-container {
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-            gap: 18px;
-            width: 100%; height: 100%;
-        }
-        .audio-bars {
-            display: flex; gap: 8px; align-items: flex-end;
-        }
-        .audio-bar {
-            width: 4px;
-            height: 24px;
-            background: rgba(255,255,255,0.2);
-        }
+    .state-indicator {
+      position: fixed;
+      right: 30px;
+      top: 30px;
+      z-index: 1000;
+      font-size: 10px;
+      color: rgba(255,255,255,0.2);
+      letter-spacing: 0.08em;
+    }
 
-        .audio-bars.s30-anim .audio-bar {
-            animation: s30Fall 2s ease-out forwards;
-        }
-        @keyframes s30Fall {
-            0%   { height: 26px; }
-            50%  { height: 14px; }
-            100% { height: 2px; }
-        }
+    .nav-hint {
+      position: fixed;
+      right: 14px;
+      bottom: 24px;
+      font-size: 18px;
+      color: rgba(255,255,255,0.35);
+      z-index: 1700;
+      opacity: 0;
+      transition: opacity 0.6s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      line-height: 0.6;
+      pointer-events: none;
+    }
+    .nav-hint.visible { opacity: 1; }
+    .nav-hint .arrow { display: inline-block; animation: bounce 2s ease infinite; }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(4px); }
+    }
 
-        .nav-hint {
-            position: fixed;
-            right: 14px;
-            bottom: 24px;
-            left: auto;
-            transform: none;
-            font-size: 18px;
-            color: rgba(255, 255, 255, 0.35);
-            z-index: 1700;
-            opacity: 0;
-            transition: opacity 0.6s ease;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            line-height: 0.6;
-            pointer-events: none;
-        }
-        .nav-hint.visible { opacity: 1; }
-        .nav-hint .arrow { display: inline-block; animation: bounce 2s ease infinite; }
+    #blackoutOverlay {
+      position: fixed; inset: 0; z-index: 8000; background: #000;
+      opacity: 0; pointer-events: none;
+      transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    #blackoutOverlay.dimming { opacity: 1; }
 
-        #navCornerSwipe {
-            position: fixed;
-            right: 0;
-            bottom: 0;
-            width: min(28vw, 120px);
-            height: min(30vh, 180px);
-            z-index: 1600;
-            touch-action: none;
-            background: transparent;
-        }
-
-        #firstGestureHint {
-            position: fixed;
-            right: min(42vw, 168px);
-            transform: translateX(50%);
-            bottom: calc(22px + min(38vh, 220px) * 0.4);
-            z-index: 1650;
-            width: 36px;
-            height: 36px;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.5s ease;
-        }
-        #firstGestureHint.visible { opacity: 0.85; }
-        #firstGestureHint .hand-icon {
-            font-size: 28px;
-            line-height: 1;
-            filter: grayscale(1);
-            opacity: 0.9;
-            animation: handSwipeDown 2.2s ease-in-out infinite;
-        }
-        #onboardingGuide {
-            position: fixed;
-            inset: 0;
-            z-index: 1750;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.35s ease;
-        }
-        #onboardingGuide.visible { opacity: 1; }
-        .onboard-title {
-            position: absolute;
-            top: 24px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 12px;
-            letter-spacing: 0.14em;
-            text-transform: none;
-            color: rgba(255,255,255,0.72);
-            opacity: 1;
-        }
-        .onboard-step {
-            position: absolute;
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-        }
-        .onboard-step.active { display: flex; }
-        #onboardStep1 {
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-        }
-        #onboardStep2 {
-            right: 16px;
-            bottom: 20px;
-            align-items: flex-end;
-        }
-        .onboard-hand {
-            width: 34px;
-            height: 34px;
-            display: block;
-            color: rgba(255,255,255,0.9);
-            filter: drop-shadow(0 0 14px rgba(255,255,255,0.2));
-            user-select: none;
-        }
-        .onboard-hand path {
-            fill: none;
-            stroke: currentColor;
-            stroke-width: 1.9;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-        }
-        .onboard-caption {
-            font-size: 11px;
-            letter-spacing: 0.16em;
-            text-transform: lowercase;
-            color: rgba(255,255,255,0.78);
-        }
-        .hand-drag { animation: onboardDragLoop 1.6s ease-in-out infinite; }
-        .hand-down { animation: onboardDownLoop 1.3s ease-in-out infinite; }
-        .tap-ring {
-            position: absolute;
-            width: 42px;
-            height: 42px;
-            border: 1px solid rgba(255,255,255,0.42);
-            border-radius: 999px;
-            animation: tapPulse 1.25s ease-out infinite;
-        }
-        @keyframes onboardDragLoop {
-            0%, 100% { transform: translateY(-8px); }
-            50% { transform: translateY(8px); }
-        }
-        @keyframes onboardDownLoop {
-            0% { transform: translateY(0); opacity: 0.7; }
-            60% { transform: translateY(12px); opacity: 1; }
-            100% { transform: translateY(0); opacity: 0.7; }
-        }
-        @keyframes tapPulse {
-            0% { transform: scale(0.75); opacity: 0.7; }
-            100% { transform: scale(1.45); opacity: 0; }
-        }
-        @keyframes handSwipeDown {
-            0%, 100% { transform: translateY(0); }
-            45% { transform: translateY(14px); }
-            55% { transform: translateY(14px); }
-        }
-
-        .state-indicator {
-            position: fixed; top: 30px; right: 30px; font-size: 10px;
-            color: rgba(255, 255, 255, 0.2); z-index: 1000;
-        }
-
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50%      { transform: translateY(4px); }
-        }
-
-        #finalFade {
-            position: fixed; inset: 0; z-index: 9999; background: #000;
-            opacity: 0; pointer-events: none; transition: opacity 2.5s ease-in;
-        }
-        #finalFade.active { opacity: 1; pointer-events: all; }
-
-        #blackoutOverlay {
-            position: fixed; inset: 0; z-index: 8000; background: #000;
-            opacity: 0; pointer-events: none; transition: opacity 2s ease-in;
-        }
-        #blackoutOverlay.dimming { opacity: 1; }
-
-        .shake {
-            animation: shake 0.4s linear infinite;
-        }
-        @keyframes shake {
-            0% { transform: translateX(0); }
-            25% { transform: translateX(-2px); }
-            50% { transform: translateX(2px); }
-            75% { transform: translateX(-1px); }
-            100% { transform: translateX(0); }
-        }
-    </style>
+    #finalFade {
+      position: fixed; inset: 0; z-index: 9999; background: #000;
+      opacity: 0; pointer-events: none;
+      transition: opacity 2.5s ease-in;
+    }
+    #finalFade.active { opacity: 1; pointer-events: all; }
+  </style>
 </head>
 <body tabindex="-1">
-
-    <div id="startOverlay">
-        <div class="access-gate" id="accessGate">
-            <div class="access-label">Access Code</div>
-            <input class="access-input" id="accessInput" type="password" placeholder="enter code" autocomplete="off" spellcheck="false">
-            <div class="access-error" id="accessError"></div>
-        </div>
-        <button id="startButton">ENTER STORY</button>
+  <div id="startOverlay">
+    <div class="access-gate" id="accessGate">
+      <div class="access-label">Access Code</div>
+      <input class="access-input" id="accessInput" type="password" placeholder="enter code" autocomplete="off" spellcheck="false">
+      <div class="access-error" id="accessError"></div>
     </div>
+    <button id="startButton">ENTER STORY</button>
+  </div>
 
-    <div class="viewport" id="viewport"></div>
-    <div id="finalFade"></div>
-    <div id="blackoutOverlay"></div>
-    <div class="state-indicator" id="stateIndicator">01 / 18</div>
-    <div class="nav-hint" id="navHint"><span class="arrow">&#709;</span><span class="arrow" style="animation-delay:0.15s">&#709;</span></div>
-    <div id="navCornerSwipe" aria-hidden="true"></div>
-    <div id="firstGestureHint" aria-hidden="true"><span class="hand-icon" title="">&#x1F446;</span></div>
-    <div id="onboardingGuide" aria-hidden="true">
-        <div class="onboard-title" id="onboardTitle">How to Read Flickfiction</div>
-        <div class="onboard-step" id="onboardStep1">
-            <span class="tap-ring"></span>
-            <svg class="onboard-hand hand-drag" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M12 22V11.5a1.5 1.5 0 0 1 3 0v5.2"/>
-                <path d="M15 16.7v-2.6a1.5 1.5 0 0 1 3 0v2.9"/>
-                <path d="M9 17.2v-3.7a1.5 1.5 0 0 1 3 0"/>
-                <path d="M6 17.5v-2.2a1.5 1.5 0 0 1 3 0"/>
-                <path d="M6.2 18.6c1.5 2.4 3.1 3.4 5.8 3.4 2.8 0 5.1-1.2 6.3-3.4"/>
-                <path d="M12 3.2v4.3"/>
-                <path d="M9.8 5.4L12 3.2l2.2 2.2"/>
-            </svg>
-            <span class="onboard-caption">here to drag</span>
-        </div>
-        <div class="onboard-step" id="onboardStep2">
-            <svg class="onboard-hand hand-down" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M12 2v10.5a1.5 1.5 0 0 0 3 0V7.3"/>
-                <path d="M15 7.3v2.6a1.5 1.5 0 0 0 3 0V7"/>
-                <path d="M9 6.8v3.7a1.5 1.5 0 0 0 3 0"/>
-                <path d="M6 6.5v2.2a1.5 1.5 0 0 0 3 0"/>
-                <path d="M6.2 5.4C7.7 3 9.3 2 12 2c2.8 0 5.1 1.2 6.3 3.4"/>
-                <path d="M12 20.8v-4.3"/>
-                <path d="M9.8 18.6L12 20.8l2.2-2.2"/>
-            </svg>
-            <span class="onboard-caption">scroll here to next state</span>
-        </div>
-    </div>
+  <div class="viewport" id="viewport"></div>
+  <div id="blackoutOverlay"></div>
+  <div id="finalFade"></div>
+  <div class="state-indicator" id="stateIndicator"></div>
+  <div class="nav-hint" id="navHint"><span class="arrow">&#709;</span><span class="arrow" style="animation-delay:0.15s">&#709;</span></div>
 
-    <script>
-        var ambientAudio = new Audio("https://files.catbox.moe/jn29tb.mp3");
-        ambientAudio.loop = true;
-        ambientAudio.volume = 0.135;
-        var alertBellUrl = 'https://pub-0f8fb9a88fd749b0987b026db4672ab5.r2.dev/iPhone%E7%9F%AD%E4%BF%A1%E9%93%83%E5%A3%B0_%E7%88%B1%E7%BB%99%E7%BD%91_aigei_com.mp3';
+  <script>
+    var states = [
+      /* S1 */
+      { type: 'ui', tone: 'tone-information', label: '[ VIDEO — TikTok feed storm ]' },
+      /* S2 */
+      { type: 'text', tone: 'tone-information', html: '<p>The reaction was nationwide.</p><p>Media saturation. News domination.</p><p class="emphasis">Who did it?</p>' },
+      /* S3 */
+      { type: 'video', tone: 'tone-opinion', label: '[ VIDEO — conservative television interview ]', src: 'https://pub-c060596a842c46ac8aac8eefd7e96cf7.r2.dev/fox.mp4' },
+      /* S3.5 */
+      { type: 'text', tone: 'tone-opinion', html: '<p>A quieter question moved beneath the footage.</p><p class="emphasis">Who benefits?</p><p>The Daltons had spent years making enemies.</p><p>One name kept surfacing—President James Carter.</p>' },
+      /* S4A */
+      { type: 'text', tone: 'tone-opinion', html: '<p>The internet began digging into the past.</p><p>Old interviews. Archived footage. Legislative battles.</p>' },
+      /* S4B */
+      { type: 'text', tone: 'tone-opinion', html: '<p>Every conflict between Carter and Dalton was reinterpreted.</p><p>People began building a case.</p>' },
+      /* S5 */
+      { type: 'video', tone: 'tone-official', label: '[ VIDEO — alternative news network ]', src: 'https://pub-c060596a842c46ac8aac8eefd7e96cf7.r2.dev/CNN.mp4' },
+      /* S5.5 */
+      { type: 'text', tone: 'tone-official', html: '<p>At the same time, competing suspects also emerge.</p><p>Extremists.</p><p>Foreign actors.</p><p>Political rivals.</p>' },
+      /* S6 */
+      { type: 'text', tone: 'tone-consensus', html: '<p>Millions attempted to solve the mystery.</p><p>Relationship charts. Timelines. Evidence threads.</p>' },
+      /* S7 */
+      { type: 'video', tone: 'tone-official', label: '[ VIDEO — President Carter confronted by reporters ]', src: 'https://pub-c060596a842c46ac8aac8eefd7e96cf7.r2.dev/%E6%80%BB%E7%BB%9F%E4%B8%8B%E8%BD%A6.mp4' },
+      /* S8 */
+      { type: 'video', tone: 'tone-consensus', label: '[ VIDEO — silence clip spreads ]', src: 'https://pub-c060596a842c46ac8aac8eefd7e96cf7.r2.dev/GIF.mp4', delayedFade: true },
+      /* S8.5 */
+      { type: 'text', tone: 'tone-consensus', html: '<p>At first, only a handful of people shared the clip.</p><p>Then thousands. Then millions.</p><p>The President\'s three seconds of silence were being replayed across the entire country.</p>' },
+      /* S10.5 */
+      { type: 'ui', tone: 'tone-consensus', label: '[ UI — pick a side ]' },
+      /* S11A */
+      { type: 'text', tone: 'tone-dissolve', html: '<p>A famous investigative journalist released a teaser.</p><p>Claims to possess evidence.</p>' },
+      /* S11B */
+      { type: 'text', tone: 'tone-dissolve', html: '<p>A 10 PM livestream was announced.</p><p>The story exploded again.</p>' },
+      /* S12 */
+      { type: 'video', tone: 'tone-official', label: '[ VIDEO — President office · Find him ]', src: 'https://pub-c060596a842c46ac8aac8eefd7e96cf7.r2.dev/%E6%80%BB%E7%BB%9F%E5%8A%9E%E5%85%AC%E5%AE%A4.mp4' },
+      /* S13 */
+      { type: 'text', tone: 'tone-dissolve', html: '<p>National press conference scheduled.</p><p>9:00 AM.</p><p>Newsrooms prepare.</p>' },
+      /* S14 */
+      { type: 'text', tone: 'tone-dissolve', html: '<p>The arguments intensified.</p><p>Every rumor found believers.</p><p>Every theory found evidence.</p>' },
+      /* S15A */
+      { type: 'text', tone: 'tone-midnight', html: '<p>After midnight, even outrage grows tired.</p>' },
+      /* S15B */
+      { type: 'text', tone: 'tone-midnight', html: '<p>The nation waits for morning.</p>' },
+      /* blackout */
+      { type: 'blackout', tone: 'tone-strike' },
+      /* S16 */
+      { type: 'video', tone: 'tone-strike', label: '[ VIDEO — hotel corridor ]', src: 'https://pub-c060596a842c46ac8aac8eefd7e96cf7.r2.dev/%E4%B8%AD%E6%9E%AA.mp4' },
+      /* blackout */
+      { type: 'blackout', tone: 'tone-strike' },
+      /* S17 alert */
+      { type: 'ui', tone: 'tone-strike', label: '[ UI — alert ]', autoNextMs: 2000 },
+      /* S17.5 breaking */
+      { type: 'ui', tone: 'tone-strike', label: '[ UI — breaking sequence ]' },
+      /* S18 */
+      { type: 'text', tone: 'tone-strike', html: '<p>If Carter ordered the killings,</p><p class="emphasis">why kill his own son?</p>' },
+      /* S19 */
+      { type: 'text', tone: 'tone-strike', html: '<p class="emphasis">What is on the note?</p>' },
+      /* S20 */
+      { type: 'text', tone: 'tone-strike', html: '<p>Then who are we looking for?</p>' },
+      /* S21 */
+      { type: 'text', tone: 'tone-strike', html: '<p class="emphasis" style="font-size: clamp(30px, 8vw, 64px); letter-spacing: 0.22em; color:#9e2222;">WHO ARE THEY?</p>', final: true }
+    ];
 
-        var states = [
-            { type: 'onboarding', tone: 'tone-rain-open', label: '' },
+    var interactiveIframes = {
+      0: 'https://remi45848-source.github.io/EP2NEW/S1.html',
+      12: 'https://remi45848-source.github.io/EP2NEW/S10.html',
+      23: 'https://remi45848-source.github.io/EP2NEW/S19.html',
+      24: 'https://remi45848-source.github.io/EP2NEW/S20.html'
+    };
 
-            { type: 'ui', tone: 'tone-information',
-              label: '[ UI \u2014 breaking notification \u00b7 daytime ]' },
+    var restartIframeIndices = { 0: true, 12: true, 23: true, 24: true };
+    var TOTAL = states.length;
+    var currentIndex = -1;
+    var experienceStarted = false;
+    var isTransitioning = false;
+    var scrollCooldown = false;
+    var autoTimer = null;
+    var SWIPE_COOLDOWN_MS = 650;
+    var preloadedVideoMap = {};
+    var preloadedDocMap = {};
+    var videoPlayTimer = null;
 
-            { type: 'text', tone: 'tone-information',
-              html: '<p>By morning, the whole country was scrolling.</p>' },
+    var ambientAudio = new Audio('https://files.catbox.moe/jn29tb.mp3');
+    ambientAudio.loop = true;
+    var AMBIENT_BASE_VOLUME = 0.135;
+    ambientAudio.volume = AMBIENT_BASE_VOLUME;
+    var ambientStarted = false;
 
-            { type: 'feed-iframe', tone: 'tone-information',
-              src: 'https://remi45848-source.github.io/rainshot-ep2/S7.html' },
+    var alertBellUrl = 'https://pub-0f8fb9a88fd749b0987b026db4672ab5.r2.dev/iPhone%E7%9F%AD%E4%BF%A1%E9%93%83%E5%A3%B0_%E7%88%B1%E7%BB%99%E7%BD%91_aigei_com.mp3';
 
-            { type: 'text', tone: 'tone-opinion',
-              html: '<p>The Daltons had survived everything.<br>Senate. Vice presidency. Forty years of reach.<br><span class="emphasis">The law had never fully touched them.</span></p>' },
+    function playBell(volume) {
+      if (!alertBellUrl) return;
+      try {
+        var bell = new Audio(alertBellUrl);
+        bell.volume = typeof volume === 'number' ? volume : 0.9;
+        bell.play().catch(function () {});
+      } catch (e) {}
+    }
 
-            { type: 'ui', tone: 'tone-opinion',
-              label: '[ UI \u2014 comment battlefield ]' },
+    function startAmbient() {
+      if (ambientStarted) return;
+      ambientStarted = true;
+      try {
+        ambientAudio.volume = AMBIENT_BASE_VOLUME;
+        ambientAudio.play().catch(function () {});
+      } catch (e) {}
+    }
 
-            { type: 'video', tone: 'tone-official',
-              label: '[ VIDEO \u2014 official response / press conference ]',
-              src: 'https://pub-0f8fb9a88fd749b0987b026db4672ab5.r2.dev/lv_0_20260326072307.mp4' },
-
-            { type: 'ui', tone: 'tone-consensus',
-              label: '[ UI — comment feed / pick a side ]' },
-
-            { type: 'text', tone: 'tone-consensus',
-              html: '<p>A phrase spread quickly: dogs eating dogs.<br>It comforted people.<br>It meant this was theirs, not ours.</p>' },
-
-            { type: 'video', tone: 'tone-strike',
-              label: '[ VIDEO \u2014 rupture clip ]',
-              src: 'https://pub-0f8fb9a88fd749b0987b026db4672ab5.r2.dev/%E5%BE%AE%E4%BF%A1%E8%A7%86%E9%A2%912026-04-16_235107_422.mp4' },
-
-            { type: 'text', tone: 'tone-dissolve',
-              html: '<p>By dinner, there was still no progress.</p>' },
-
-            { type: 'text', tone: 'tone-midnight',
-              html: '<p>At last, the rain had stopped.</p>' },
-
-            { type: 'video', tone: 'tone-strike',
-              label: '[ VIDEO \u2014 rupture clip 2 ]',
-              src: 'https://pub-0f8fb9a88fd749b0987b026db4672ab5.r2.dev/%E5%BE%AE%E4%BF%A1%E8%A7%86%E9%A2%912026-04-15_225044_829.mp4' },
-
-            { type: 'text', tone: 'tone-strike',
-              html: '<p class="emphasis">2:17 AM.</p>' },
-
-            { type: 'ui-s32', tone: 'tone-strike',
-              label: '[ UI \u2014 late-night red badge ]' },
-
-            { type: 'ui', tone: 'tone-strike',
-              label: '[ UI \u2014 push lines unfold ]' },
-
-            { type: 'text', tone: 'tone-strike',
-              html: '<p>Within one day, a second figure had fallen.</p>' },
-
-            { type: 'text', tone: 'tone-strike',
-              html: '<p><span class="tightened-red">The nerves of an entire country tightened again.</span></p>' }
-        ];
-
-        var TOTAL = states.length;
-        var currentIndex = -1;
-        var isTransitioning = false;
-        var autoTimer = null;
-        var scrollCooldown = false;
-        var blackoutLock = false;
-        var firstHintTimer = null;
-        var SWIPE_COOLDOWN_MS = 650;
-        var onboardingStep = 0;
-        var onboardingDone = false;
-        var onboardingStep2ReadyAt = 0;
-        var onboardingLastInputAt = 0;
-        var s5Drag = { enabled: false, active: false, panEl: null, layer: null, startY: 0, startTranslate: 0 };
-        var s1NavStartY = 0;
-        var s1NavTouching = false;
-
-        function showOnboardingStep1() {
-            if (onboardingDone) return;
-            var guide = document.getElementById('onboardingGuide');
-            var s1 = document.getElementById('onboardStep1');
-            var s2 = document.getElementById('onboardStep2');
-            var title = document.getElementById('onboardTitle');
-            guide.classList.add('visible');
-            s1.classList.add('active');
-            s2.classList.remove('active');
-            title.style.opacity = '1';
-            onboardingStep = 1;
+    function fadeAmbientOut() {
+      if (!ambientStarted) return;
+      var steps = 20;
+      var step = 0;
+      var fadeTimer = setInterval(function () {
+        step++;
+        ambientAudio.volume = Math.max(0, AMBIENT_BASE_VOLUME * (1 - step / steps));
+        if (step >= steps) {
+          clearInterval(fadeTimer);
+          try { ambientAudio.pause(); } catch (e) {}
         }
+      }, 100);
+    }
 
-        function showOnboardingStep2() {
-            if (onboardingDone || onboardingStep !== 1) return;
-            var s1 = document.getElementById('onboardStep1');
-            var s2 = document.getElementById('onboardStep2');
-            var title = document.getElementById('onboardTitle');
-            s1.classList.remove('active');
-            s2.classList.add('active');
-            title.style.opacity = '1';
-            onboardingStep = 2;
-            onboardingStep2ReadyAt = Date.now() + 320;
+    function startExperience() {
+      if (experienceStarted) return;
+      experienceStarted = true;
+      document.getElementById('startOverlay').classList.add('hidden');
+      startAmbient();
+      setTimeout(function () { gotoState(0); }, 300);
+    }
+
+    function buildState(index, st) {
+      var el = document.createElement('div');
+      el.className = 'state ' + st.tone;
+      el.dataset.index = index;
+
+      if (st.type === 'text' || st.type === 'blackout') {
+        el.innerHTML = '<div class="text">' + (st.html || '') + '</div>';
+      } else if (st.type === 'video') {
+        if (st.src) {
+          el.innerHTML = '<div class="video-shell"><video class="story-video" playsinline webkit-playsinline preload="metadata" data-src="' + st.src + '"></video></div>';
+        } else {
+          el.innerHTML = '<div class="video-shell"><div class="placeholder">' + (st.label || '[ VIDEO ]') + '</div></div>';
         }
-
-        function hideOnboardingGuide() {
-            var guide = document.getElementById('onboardingGuide');
-            var s1 = document.getElementById('onboardStep1');
-            var s2 = document.getElementById('onboardStep2');
-            var title = document.getElementById('onboardTitle');
-            guide.classList.remove('visible');
-            s1.classList.remove('active');
-            s2.classList.remove('active');
-            title.style.opacity = '0';
-            onboardingDone = true;
-            onboardingStep = 0;
+      } else if (st.type === 'ui' || st.type === 'ui-s32') {
+        if (interactiveIframes.hasOwnProperty(index)) {
+          el.innerHTML = '<div class="ui-shell"><iframe class="story-iframe" src="about:blank" data-src="' + interactiveIframes[index] + '" title="story-ui" allow="autoplay *"></iframe></div>';
+        } else {
+          el.innerHTML = '<div class="ui-shell"><div class="placeholder">' + (st.label || '[ UI ]') + '</div></div>';
         }
+      }
+      return el;
+    }
 
-        function updateFirstGestureHint(index) {
-            var el = document.getElementById('firstGestureHint');
-            if (!el) return;
-            if (firstHintTimer) {
-                clearTimeout(firstHintTimer);
-                firstHintTimer = null;
-            }
-            if (index === 0 && states[index] && states[index].type === 'text') {
-                el.classList.remove('visible');
-                setTimeout(function() { el.classList.add('visible'); }, 900);
-                firstHintTimer = setTimeout(function() {
-                    el.classList.remove('visible');
-                }, 10000);
-            } else {
-                el.classList.remove('visible');
-            }
+    function hardStopVideo(video) {
+      if (!video) return;
+      try {
+        video.pause();
+        video.muted = true;
+        video.onended = null;
+      } catch (e) {}
+    }
+
+    function stopAllStoryMedia(nextIndex) {
+      if (videoPlayTimer) {
+        clearTimeout(videoPlayTimer);
+        videoPlayTimer = null;
+      }
+
+      var allVideos = document.querySelectorAll('video.story-video');
+      for (var i = 0; i < allVideos.length; i++) {
+        hardStopVideo(allVideos[i]);
+      }
+
+      var iframes = document.querySelectorAll('iframe.story-iframe');
+      for (var j = 0; j < iframes.length; j++) {
+        try {
+          if (iframes[j].contentWindow) {
+            iframes[j].contentWindow.postMessage({ type: 'EP2_PAUSE' }, '*');
+          }
+        } catch (e) {}
+      }
+
+      var states = document.querySelectorAll('.state');
+      for (var s = 0; s < states.length; s++) {
+        var stateIdx = parseInt(states[s].getAttribute('data-index'), 10);
+        if (stateIdx === nextIndex) continue;
+        var frame = states[s].querySelector('iframe.story-iframe');
+        if (frame && frame.src && frame.src !== 'about:blank') {
+          frame.src = 'about:blank';
         }
+      }
+    }
 
-        var interactiveIframes = {
-            1:  'https://remi45848-source.github.io/rainshot-ep2/S4.html',
-            5:  'https://remi45848-source.github.io/rainshot-ep2/S11.html',
-            7:  'https://remi45848-source.github.io/rainshot-ep2/S17.html',
-            14: 'https://remi45848-source.github.io/rainshot-ep2/S32.html',
-            15: 'https://remi45848-source.github.io/rainshot-ep2/S34.html'
+    function ensureVideoSrc(video) {
+      if (!video || video.src) return;
+      var src = video.getAttribute('data-src');
+      if (src) video.src = src;
+    }
+
+    function preloadVideoUrl(url) {
+      if (!url || preloadedVideoMap[url]) return;
+      preloadedVideoMap[url] = true;
+      var v = document.createElement('video');
+      v.preload = 'auto';
+      v.src = url;
+      try { v.load(); } catch (e) {}
+    }
+
+    function preloadUpcomingVideos(fromIndex) {
+      var loaded = 0;
+      for (var i = fromIndex + 1; i < TOTAL && loaded < 3; i++) {
+        var st = states[i];
+        if (!st || st.type !== 'video' || !st.src) continue;
+        preloadVideoUrl(st.src);
+        var el = document.querySelector('[data-index="' + i + '"] video.story-video');
+        if (el) {
+          ensureVideoSrc(el);
+          try { el.preload = 'auto'; el.load(); } catch (e) {}
+        }
+        loaded++;
+      }
+    }
+
+    function prefetchDocument(url) {
+      if (!url || preloadedDocMap[url]) return;
+      preloadedDocMap[url] = true;
+      try {
+        var l = document.createElement('link');
+        l.rel = 'prefetch';
+        l.as = 'document';
+        l.href = url;
+        document.head.appendChild(l);
+      } catch (e) {}
+    }
+
+    function resolveIframeSrc(index, baseSrc) {
+      if (!baseSrc) return baseSrc;
+      var sep = baseSrc.indexOf('?') > -1 ? '&' : '?';
+      if (index === 12) return baseSrc + sep + 'mode=pick';
+      return baseSrc;
+    }
+
+    function primeIframe(index, el, forceRestart) {
+      var frame = el.querySelector('iframe.story-iframe');
+      if (!frame) return;
+      var baseSrc = frame.getAttribute('data-src');
+      if (!baseSrc) return;
+      var src = resolveIframeSrc(index, baseSrc);
+      frame.classList.remove('s9-fade-in');
+      void frame.offsetWidth;
+      frame.classList.add('s9-fade-in');
+      if (forceRestart || restartIframeIndices[index]) {
+        frame.src = src + (src.indexOf('?') > -1 ? '&' : '?') + 't=' + Date.now();
+      } else if (!frame.src || frame.src === 'about:blank') {
+        frame.src = src;
+      }
+    }
+
+    function startActiveVideo(index, activeEl, st) {
+      var video = activeEl.querySelector('video.story-video');
+      if (!video) return false;
+      ensureVideoSrc(video);
+      try {
+        video.pause();
+        video.currentTime = 0;
+        video.muted = false;
+        video.playsInline = true;
+        video.classList.remove('s13-delayed-fade');
+        if (st && st.delayedFade) video.classList.add('s13-delayed-fade');
+
+        video.onended = function () {
+          if (currentIndex === index) gotoState(index + 1);
         };
 
-        function buildStateElement(index, state) {
-            var stateEl = document.createElement('div');
-            stateEl.className = 'state';
-            stateEl.setAttribute('data-index', index);
+        var playNow = function () {
+          videoPlayTimer = null;
+          if (currentIndex !== index) return;
+          video.muted = false;
+          video.play().catch(function () {
+            autoTimer = setTimeout(function () {
+              if (currentIndex === index) gotoState(index + 1);
+            }, 7000);
+          });
+        };
 
-            var inner = '<div class="bg ' + state.tone + '"></div>';
-
-            if (state.type === 'text') {
-                inner += '<div class="text-content">' + state.html + '</div>';
-            } else if (state.type === 'feed-iframe') {
-                inner += '<iframe class="story-iframe feed-tk-iframe" data-src="' + state.src + '" src="about:blank" title="tk-feed" allow="autoplay *; fullscreen *"></iframe>';
-            } else if (state.type === 'video') {
-                if (state.src) {
-                    inner += '<video class="story-video" playsinline webkit-playsinline preload="auto" src="' + state.src + '"></video>';
-                } else {
-                    inner += '<div class="video-placeholder-rect">' +
-                             '<div class="video-placeholder-label">' + state.label + '</div>' +
-                             '</div>';
-                }
-            } else if (state.type === 'ui-s20') {
-                inner += '<div class="s20-audio-shell">' +
-                         '<div class="s20-audio-card">' +
-                         '<div class="s20-title">Night Ambience</div>' +
-                         '<div class="s20-bars"><span></span><span></span><span></span><span></span><span></span></div>' +
-                         '<div class="s20-sub">CITY NOISE LEVEL: LOW</div>' +
-                         '</div>' +
-                         '</div>';
-            } else if (state.type === 'ui' || state.type === 'ui-s32') {
-                if (interactiveIframes.hasOwnProperty(index)) {
-                    if (index === 5) {
-                        inner += '<div class="s6-iframe-shell"><div class="s6-iframe-pan">' +
-                            '<iframe class="story-iframe" data-src="' + interactiveIframes[index] + '" src="about:blank" title="story-ui"></iframe>' +
-                            '</div></div>' +
-                            '<div class="pick-side-callout" aria-hidden="true"><span class="pick-side-pulse">pick a side</span></div>' +
-                            '<div class="s6-drag-layer" aria-hidden="true"></div>';
-                    } else if (index === 1) {
-                        inner += '<iframe class="story-iframe" data-src="' + interactiveIframes[index] + '" src="about:blank" title="story-ui"></iframe>' +
-                            '<div class="s1-nav-layer" aria-hidden="true"></div>';
-                    } else {
-                        inner += '<iframe class="story-iframe" data-src="' + interactiveIframes[index] + '" src="about:blank" title="story-ui"></iframe>';
-                    }
-                } else {
-                    inner += '<div class="ui-placeholder-container">' +
-                             '<div class="ui-placeholder-label">' + state.label + '</div>' +
-                             '</div>';
-                }
-            } else if (state.type === 'audio' || state.type === 'audio-s30') {
-                if (interactiveIframes.hasOwnProperty(index) && state.type === 'audio') {
-                    inner += '<iframe class="story-iframe" data-src="' + interactiveIframes[index] + '" src="about:blank" title="story-ui"></iframe>';
-                } else {
-                    inner += '<div class="audio-placeholder-container">' +
-                             '<div class="audio-bars' + (state.type === "audio-s30" ? " s30-bars" : "") + '">' +
-                             '<div class="audio-bar"></div>' +
-                             '<div class="audio-bar"></div>' +
-                             '<div class="audio-bar"></div>' +
-                             '<div class="audio-bar"></div>' +
-                             '<div class="audio-bar"></div>' +
-                             '</div>' +
-                             '<div class="audio-placeholder-label">' + state.label + '</div>' +
-                             '</div>';
-                }
-            }
-
-            stateEl.innerHTML = inner;
-            return stateEl;
+        if (st && st.delayedFade) {
+          videoPlayTimer = setTimeout(playNow, 2000);
+        } else {
+          videoPlayTimer = setTimeout(playNow, 350);
         }
+      } catch (e) {}
+      return true;
+    }
 
-        function init() {
-            var viewport = document.getElementById('viewport');
-            for (var i = 0; i < TOTAL; i++) {
-                viewport.appendChild(buildStateElement(i, states[i]));
-            }
+    function gotoState(index) {
+      if (!experienceStarted) return;
+      if (index < 0 || index >= TOTAL) return;
+      if (isTransitioning && index !== currentIndex) return;
 
-            // Password gate
-            var accessInput = document.getElementById('accessInput');
-            var accessGate = document.getElementById('accessGate');
-            var accessError = document.getElementById('accessError');
-            accessInput.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter') {
-                    if (accessInput.value.toLowerCase().trim() === 'flickfiction') {
-                        accessGate.style.opacity = '0';
-                        accessGate.style.transition = 'opacity 0.5s ease';
-                        setTimeout(function() {
-                            accessGate.style.display = 'none';
-                            document.getElementById('startButton').style.display = 'inline-block';
-                        }, 500);
-                    } else {
-                        accessInput.classList.add('error');
-                        accessError.textContent = 'Invalid code';
-                        setTimeout(function() { accessInput.classList.remove('error'); accessError.textContent = ''; }, 1500);
-                    }
-                }
-            });
+      isTransitioning = true;
+      if (autoTimer) { clearTimeout(autoTimer); autoTimer = null; }
+      stopAllStoryMedia(index);
 
-            document.getElementById('startButton').addEventListener('click', startExperience);
-            document.getElementById('startButton').addEventListener('touchend', function(e) {
-                e.preventDefault(); startExperience();
-            });
+      var hint = document.getElementById('navHint');
+      hint.classList.remove('visible');
 
-            window.addEventListener('wheel', function(e) {
-                if (scrollCooldown) return;
-                if (currentIndex < 0) return;
-                if (blackoutLock) return;
-                if (currentIndex === 0) return;
-                scrollCooldown = true;
-                if (e.deltaY > 0) gotoState(currentIndex + 1);
-                else if (e.deltaY < 0) gotoState(currentIndex - 1);
-                setTimeout(function() { scrollCooldown = false; }, SWIPE_COOLDOWN_MS);
-            }, { passive: true });
+      var prev = document.querySelector('.state.active');
+      if (prev) prev.classList.remove('active');
 
-            var cornerTouchStartY = 0;
-            var navCornerEl = document.getElementById('navCornerSwipe');
-            navCornerEl.addEventListener('touchstart', function(e) {
-                if (blackoutLock || currentIndex < 0) return;
-                cornerTouchStartY = e.touches[0].clientY;
-            }, { passive: true });
-            navCornerEl.addEventListener('touchend', function(e) {
-                if (blackoutLock || currentIndex < 0) return;
-                if (scrollCooldown) return;
-                var diff = cornerTouchStartY - e.changedTouches[0].clientY;
-                if (Math.abs(diff) < 26) return;
-                if (currentIndex === 0) {
-                    if (onboardingStep !== 2) return;
-                    scrollCooldown = true;
-                    if (diff > 0) gotoState(1);
-                    setTimeout(function() { scrollCooldown = false; }, SWIPE_COOLDOWN_MS);
-                    return;
-                }
-                scrollCooldown = true;
-                if (diff > 0) gotoState(currentIndex + 1);
-                else gotoState(currentIndex - 1);
-                setTimeout(function() { scrollCooldown = false; }, SWIPE_COOLDOWN_MS);
-            }, { passive: true });
+      var next = document.querySelector('.state[data-index="' + index + '"]');
+      if (!next) { isTransitioning = false; return; }
+      next.classList.add('active');
+      currentIndex = index;
 
-            var fullTouchStartY = 0;
-            window.addEventListener('touchstart', function(e) {
-                if (blackoutLock || currentIndex < 0) return;
-                if (states[currentIndex].type !== 'text') return;
-                if (currentIndex === TOTAL - 1) return;
-                fullTouchStartY = e.touches[0].clientY;
-            }, { passive: true });
-            window.addEventListener('touchend', function(e) {
-                if (blackoutLock || currentIndex < 0) return;
-                if (states[currentIndex].type !== 'text') return;
-                if (currentIndex === TOTAL - 1) return;
-                if (scrollCooldown) return;
-                if (currentIndex === 0) return;
-                var diff = fullTouchStartY - e.changedTouches[0].clientY;
-                if (Math.abs(diff) < 50) return;
-                scrollCooldown = true;
-                if (diff > 0) gotoState(currentIndex + 1);
-                else gotoState(currentIndex - 1);
-                setTimeout(function() { scrollCooldown = false; }, SWIPE_COOLDOWN_MS);
-            }, { passive: true });
+      document.getElementById('stateIndicator').textContent =
+        String(index + 1).padStart(2, '0') + ' / ' + TOTAL;
 
-            window.addEventListener('touchstart', function(e) {
-                if (currentIndex !== 5 || !s5Drag.enabled || !s5Drag.panEl) return;
-                s5Drag.active = true;
-                s5Drag.startY = e.touches[0].clientY;
-                s5Drag.startTranslate = getTranslateYPx(s5Drag.panEl);
-            }, { passive: true });
-            window.addEventListener('touchmove', function(e) {
-                if (currentIndex !== 5 || !s5Drag.enabled || !s5Drag.active || !s5Drag.panEl) return;
-                e.preventDefault();
-                var dy = e.touches[0].clientY - s5Drag.startY;
-                var next = s5Drag.startTranslate + dy;
-                var minY = Math.min(0, window.innerHeight - s5Drag.panEl.offsetHeight);
-                if (next < minY) next = minY;
-                if (next > 0) next = 0;
-                s5Drag.panEl.style.transform = 'translateY(' + next + 'px)';
-            }, { passive: false });
-            window.addEventListener('touchend', function() {
-                if (s5Drag.active) s5Drag.active = false;
-            }, { passive: true });
+      var st = states[index];
+      var textEl = next.querySelector('.text');
+      if (textEl) {
+        textEl.classList.remove('s31-fade-in');
+        void textEl.offsetWidth;
+        if (st.type === 'text' && st.html) textEl.classList.add('s31-fade-in');
+      }
 
-            var viewportForS1 = document.getElementById('viewport');
-            viewportForS1.addEventListener('touchstart', function (e) {
-                if (currentIndex !== 1 || blackoutLock) return;
-                if (!e.target || !e.target.classList || !e.target.classList.contains('s1-nav-layer')) return;
-                s1NavTouching = true;
-                s1NavStartY = e.touches[0].clientY;
-            }, { passive: true });
-            viewportForS1.addEventListener('touchcancel', function () { s1NavTouching = false; }, { passive: true });
-            viewportForS1.addEventListener('touchend', function (e) {
-                if (!s1NavTouching) return;
-                s1NavTouching = false;
-                if (currentIndex !== 1 || blackoutLock) return;
-                if (scrollCooldown) return;
-                var diff = s1NavStartY - (e.changedTouches[0] && e.changedTouches[0].clientY);
-                if (Math.abs(diff) < 50) return;
-                scrollCooldown = true;
-                if (diff > 0) gotoState(currentIndex + 1);
-                else gotoState(currentIndex - 1);
-                setTimeout(function () { scrollCooldown = false; }, SWIPE_COOLDOWN_MS);
-            }, { passive: true });
+      preloadUpcomingVideos(index);
+      if (interactiveIframes[0]) prefetchDocument(interactiveIframes[0]);
 
-            function handleOnboardingTap() {
-                if (currentIndex !== 0) return;
-                var now = Date.now();
-                if (now - onboardingLastInputAt < 220) return;
-                onboardingLastInputAt = now;
-                if (onboardingStep === 1) {
-                    showOnboardingStep2();
-                    return;
-                }
-                if (onboardingStep === 2 && !scrollCooldown) {
-                    if (now < onboardingStep2ReadyAt) return;
-                    scrollCooldown = true;
-                    gotoState(1);
-                    setTimeout(function() { scrollCooldown = false; }, 800);
-                }
-            }
-            window.addEventListener('pointerdown', handleOnboardingTap, { passive: true });
-            window.addEventListener('touchstart', handleOnboardingTap, { passive: true });
-            window.addEventListener('click', handleOnboardingTap, { passive: true });
+      document.getElementById('blackoutOverlay').classList.remove('dimming');
 
-            window.addEventListener('keydown', function(e) {
-                if (blackoutLock) return;
-                if (currentIndex < 0) return;
-                if (currentIndex === 0) return;
-                if (e.key === 'Escape') {
-                    var ae = document.activeElement;
-                    if (ae && ae.tagName === 'IFRAME') {
-                        ae.blur();
-                        document.body.focus();
-                    }
-                    return;
-                }
-                if (e.key === 'ArrowDown' || e.key === ' ') {
-                    if (e.key === ' ') e.preventDefault();
-                    gotoState(currentIndex + 1);
-                }
-                if (e.key === 'ArrowUp') gotoState(currentIndex - 1);
-            });
+      if (st.type === 'blackout') {
+        document.getElementById('blackoutOverlay').classList.add('dimming');
+        setTimeout(function () { hint.classList.add('visible'); }, 1200);
+        setTimeout(function () { isTransitioning = false; }, 800);
+        return;
+      }
 
-            window.addEventListener('message', function (event) {
-                var data = event.data;
-                if (!data || typeof data !== 'object') return;
-                if (data.type === 'EP2_S3_FEED_DONE' && currentIndex === 3) {
-                    setTimeout(function () {
-                        if (currentIndex === 3) gotoState(4);
-                    }, 0);
-                }
-            });
-
+      if (st.type === 'video') {
+        if (!startActiveVideo(index, next, st)) {
+          autoTimer = setTimeout(function () {
+            if (currentIndex === index) gotoState(index + 1);
+          }, 4000);
         }
+        setTimeout(function () { isTransitioning = false; }, 800);
+        return;
+      }
 
-        function focusStoryShell() {
-            try {
-                var ae = document.activeElement;
-                if (ae && ae.tagName === 'IFRAME') ae.blur();
-                window.focus();
-                document.body.focus();
-            } catch (err) {}
+      if (st.type === 'ui' || st.type === 'ui-s32') {
+        primeIframe(index, next, true);
+        if (index === 23) playBell(0.9);
+        setTimeout(function () { hint.classList.add('visible'); }, 1200);
+        if (typeof st.autoNextMs === 'number') {
+          autoTimer = setTimeout(function () {
+            if (currentIndex === index) gotoState(index + 1);
+          }, st.autoNextMs);
         }
+        setTimeout(function () { isTransitioning = false; }, 800);
+        return;
+      }
 
-        function shouldRestartIframe(index) {
-            return index === 1 || index === 3 || index === 5 || index === 7 || index === 14 || index === 15;
+      if (st.type === 'text') {
+        if (st.final) {
+          setTimeout(function () {
+            if (currentIndex === index) {
+              document.getElementById('finalFade').classList.add('active');
+              fadeAmbientOut();
+            }
+          }, 5200);
+        } else {
+          setTimeout(function () { hint.classList.add('visible'); }, 1200);
         }
+        setTimeout(function () { isTransitioning = false; }, 800);
+        return;
+      }
 
-        function primeActiveIframe(index, activeEl) {
-            if (!activeEl) return;
-            var iframe = activeEl.querySelector('iframe.story-iframe');
-            if (!iframe) return;
-            var baseSrc = iframe.getAttribute('data-src');
-            if (!baseSrc) return;
-            if (shouldRestartIframe(index)) {
-                iframe.src = baseSrc + (baseSrc.indexOf('?') > -1 ? '&' : '?') + 't=' + Date.now();
-                return;
-            }
-            if (!iframe.src || iframe.src === 'about:blank') {
-                iframe.src = baseSrc;
-            }
+      setTimeout(function () { isTransitioning = false; }, 800);
+    }
+
+    (function init() {
+      var viewport = document.getElementById('viewport');
+      for (var i = 0; i < TOTAL; i++) {
+        viewport.appendChild(buildState(i, states[i]));
+      }
+
+      /* 预加载 S1 + S3 视频 */
+      prefetchDocument(interactiveIframes[0]);
+      preloadVideoUrl(states[2].src);
+
+      var accessInput = document.getElementById('accessInput');
+      var accessGate = document.getElementById('accessGate');
+      var accessError = document.getElementById('accessError');
+      accessInput.addEventListener('keydown', function (e) {
+        if (e.key !== 'Enter') return;
+        if (accessInput.value.toLowerCase().trim() === 'flickfiction') {
+          accessGate.style.opacity = '0';
+          accessGate.style.transition = 'opacity 0.5s ease';
+          setTimeout(function () {
+            accessGate.style.display = 'none';
+            document.getElementById('startButton').style.display = 'inline-block';
+          }, 500);
+        } else {
+          accessInput.classList.add('error');
+          accessError.textContent = 'Invalid code';
+          setTimeout(function () {
+            accessInput.classList.remove('error');
+            accessError.textContent = '';
+          }, 1500);
         }
+      });
 
-        function playBell(volume) {
-            try {
-                var bell = new Audio(alertBellUrl);
-                bell.volume = typeof volume === 'number' ? volume : 0.9;
-                bell.play().catch(function() {});
-            } catch (e) {}
+      document.getElementById('startButton').addEventListener('click', startExperience);
+      document.getElementById('startButton').addEventListener('touchend', function (e) {
+        e.preventDefault();
+        startExperience();
+      });
+
+      window.addEventListener('message', function (event) {
+        var data = event.data;
+        if (!data || typeof data !== 'object') return;
+        if (data.type === 'EP2_S3_FEED_DONE' && currentIndex === 0) {
+          gotoState(1);
         }
-
-        var preloadedVideoMap = {};
-        var preloadedDocMap = {};
-        var preconnectedOriginMap = {};
-        function preloadUpcomingVideos(currentIndex) {
-            var loaded = 0;
-            for (var i = currentIndex + 1; i < TOTAL && loaded < 3; i++) {
-                var st = states[i];
-                if (!st || st.type !== 'video' || !st.src) continue;
-                if (preloadedVideoMap[st.src]) continue;
-                var v = document.createElement('video');
-                v.preload = 'auto';
-                v.src = st.src;
-                try { v.load(); } catch (e) {}
-                preloadedVideoMap[st.src] = true;
-                loaded++;
-            }
+        /* S10.5：消息发送后 4s 自动进入 S11A */
+        if (data.type === 'EP2_S10_DONE' && currentIndex === 12) {
+          if (autoTimer) { clearTimeout(autoTimer); autoTimer = null; }
+          autoTimer = setTimeout(function () {
+            if (currentIndex === 12) gotoState(13);
+          }, 4000);
         }
-
-        function preconnectOriginFor(url) {
-            try {
-                var u = new URL(url, location.href);
-                if (preconnectedOriginMap[u.origin]) return;
-                preconnectedOriginMap[u.origin] = true;
-                var l1 = document.createElement('link');
-                l1.rel = 'preconnect';
-                l1.href = u.origin;
-                l1.crossOrigin = 'anonymous';
-                document.head.appendChild(l1);
-                var l2 = document.createElement('link');
-                l2.rel = 'dns-prefetch';
-                l2.href = u.origin;
-                document.head.appendChild(l2);
-            } catch (e) {}
+        if (data.type === 'EP2_BREAKING_DONE' && currentIndex === 24) {
+          gotoState(25);
         }
+      });
 
-        function prefetchDocument(url) {
-            if (!url || preloadedDocMap[url]) return;
-            preloadedDocMap[url] = true;
-            preconnectOriginFor(url);
-            try {
-                var l = document.createElement('link');
-                l.rel = 'prefetch';
-                l.as = 'document';
-                l.href = url;
-                document.head.appendChild(l);
-            } catch (e) {}
+      window.addEventListener('wheel', function (e) {
+        if (!experienceStarted) return;
+        if (scrollCooldown || isTransitioning) return;
+        scrollCooldown = true;
+        if (e.deltaY > 0) gotoState(currentIndex + 1);
+        else if (e.deltaY < 0) gotoState(currentIndex - 1);
+        setTimeout(function () { scrollCooldown = false; }, SWIPE_COOLDOWN_MS);
+      }, { passive: true });
+
+      var touchStartY = 0;
+      window.addEventListener('touchstart', function (e) {
+        touchStartY = e.touches[0].clientY;
+      }, { passive: true });
+      window.addEventListener('touchend', function (e) {
+        if (!experienceStarted) return;
+        if (scrollCooldown || isTransitioning) return;
+        var diff = touchStartY - e.changedTouches[0].clientY;
+        if (Math.abs(diff) < 50) return;
+        scrollCooldown = true;
+        if (diff > 0) gotoState(currentIndex + 1);
+        else gotoState(currentIndex - 1);
+        setTimeout(function () { scrollCooldown = false; }, SWIPE_COOLDOWN_MS);
+      }, { passive: true });
+
+      window.addEventListener('keydown', function (e) {
+        if (!experienceStarted) return;
+        if (isTransitioning) return;
+        if (e.key === 'ArrowDown' || e.key === ' ') {
+          if (e.key === ' ') e.preventDefault();
+          gotoState(currentIndex + 1);
         }
-
-        function preloadUpcomingEmbeddedDocs(currentIndex) {
-            for (var i = currentIndex + 1; i < TOTAL && i <= currentIndex + 3; i++) {
-                var st = states[i];
-                if (!st) continue;
-                if (st.type === 'feed-iframe' && st.src) {
-                    prefetchDocument(st.src);
-                }
-            }
-        }
-
-        function getTranslateYPx(el) {
-            if (!el) return 0;
-            var tr = window.getComputedStyle(el).transform;
-            if (!tr || tr === 'none') return 0;
-            var m = tr.match(/matrix\(([^)]+)\)/);
-            if (m && m[1]) {
-                var parts = m[1].split(',');
-                return parseFloat(parts[5]) || 0;
-            }
-            var m3 = tr.match(/matrix3d\(([^)]+)\)/);
-            if (m3 && m3[1]) {
-                var p3 = m3[1].split(',');
-                return parseFloat(p3[13]) || 0;
-            }
-            return 0;
-        }
-
-        function startActiveVideo(index, activeEl) {
-            if (!activeEl) return false;
-            var video = activeEl.querySelector('video.story-video');
-            if (!video) return false;
-            try {
-                video.pause();
-                video.currentTime = 0;
-                video.muted = false;
-                video.autoplay = true;
-                video.onended = function () {
-                    if (currentIndex === index) gotoState(index + 1);
-                };
-                video.play().catch(function () {
-                    setTimeout(function () {
-                        if (currentIndex === index) gotoState(index + 1);
-                    }, 7000);
-                });
-            } catch (err) {}
-            return true;
-        }
-
-        var started = false;
-        function startExperience() {
-            if (started) return;
-            started = true;
-            document.getElementById('startOverlay').classList.add('hidden');
-            try {
-                ambientAudio.play().catch(function() {});
-            } catch (e) {}
-            setTimeout(function() { gotoState(0); }, 300);
-        }
-
-        function gotoState(index) {
-            if (!started || index < 0 || index >= TOTAL) { return; }
-            if (blackoutLock) return;
-            if (states[index] && states[index].type === 'audio-s30') {
-                gotoState(index + 1);
-                return;
-            }
-            if (isTransitioning && index !== currentIndex) return;
-            isTransitioning = true;
-
-            if (autoTimer) { clearTimeout(autoTimer); autoTimer = null; }
-
-            var hint = document.getElementById('navHint');
-            hint.classList.remove('visible');
-
-            var allStates = document.querySelectorAll('.state');
-            for (var s = 0; s < allStates.length; s++) {
-                allStates[s].classList.remove('active');
-            }
-
-            var activeEl = document.querySelector('[data-index="' + index + '"]');
-            activeEl.classList.add('active');
-            if (index !== 0) hideOnboardingGuide();
-            primeActiveIframe(index, activeEl);
-
-            var activeText = activeEl.querySelector('.text-content');
-            if (activeText) activeText.classList.remove('s31-fade-in');
-            if (activeText) activeText.classList.remove('s21-delayed-fade');
-            if (activeText) activeText.classList.remove('s20-dim-after');
-            if (activeText) activeText.classList.remove('s14-delayed-fade');
-            if (activeText) activeText.classList.remove('s12-dim-out');
-            if (activeText) activeText.classList.remove('s8-dim-out');
-            if (activeText) activeText.classList.remove('s18-delayed-in');
-            var animSpans = activeEl.querySelectorAll('.anim');
-            for (var a = 0; a < animSpans.length; a++) animSpans[a].classList.remove('anim');
-            var activeVideoEl = activeEl.querySelector('video.story-video');
-            if (activeVideoEl) activeVideoEl.classList.remove('s11-delayed-fade');
-            if (activeVideoEl) activeVideoEl.classList.remove('s13-delayed-fade');
-            var activeIframeEl = activeEl.querySelector('iframe.story-iframe');
-            if (activeIframeEl) activeIframeEl.classList.remove('s14-delayed-play');
-            s5Drag.enabled = false;
-            s5Drag.panEl = null;
-            if (s5Drag.layer) s5Drag.layer.classList.remove('enabled');
-            s5Drag.layer = null;
-            s5Drag.active = false;
-
-            if (index === 5) {
-                var panEl = activeEl.querySelector('.s6-iframe-pan');
-                var pickEl = activeEl.querySelector('.pick-side-callout');
-                var dragLayer = activeEl.querySelector('.s6-drag-layer');
-                if (pickEl) pickEl.classList.remove('visible');
-                if (dragLayer) dragLayer.classList.remove('enabled');
-                if (panEl) {
-                    panEl.style.transform = '';
-                    panEl.classList.remove('s6-auto-paused');
-                    panEl.classList.remove('s6-iframe-pan-anim');
-                    void panEl.offsetWidth;
-                    panEl.classList.add('s6-iframe-pan-anim');
-                }
-                setTimeout(function () {
-                    if (currentIndex === 5 && pickEl && panEl) {
-                        pickEl.classList.add('visible');
-                        var currentY = getTranslateYPx(panEl);
-                        panEl.classList.add('s6-auto-paused');
-                        panEl.classList.remove('s6-iframe-pan-anim');
-                        panEl.style.transform = 'translateY(' + currentY + 'px)';
-                        s5Drag.enabled = true;
-                        s5Drag.panEl = panEl;
-                        s5Drag.layer = dragLayer || null;
-                        if (s5Drag.layer) s5Drag.layer.classList.add('enabled');
-                    }
-                }, 42000);
-            }
-
-            currentIndex = index;
-            preloadUpcomingVideos(index);
-            preloadUpcomingEmbeddedDocs(index);
-            var displayNumber = (index + 1);
-            document.getElementById('stateIndicator').innerText =
-                (displayNumber < 10 ? '0' : '') + displayNumber + ' / ' + TOTAL;
-
-            var state = states[index];
-            updateFirstGestureHint(index);
-
-            if (state.type === 'onboarding') {
-                showOnboardingStep1();
-                setTimeout(function() { isTransitioning = false; }, 250);
-                return;
-            }
-
-            if (state.type === 'text') {
-                if (index === 11 && activeText) {
-                    activeText.classList.add('s8-dim-out');
-                    autoTimer = setTimeout(function() {
-                        if (currentIndex === 11) gotoState(12);
-                    }, 3500);
-                }
-                if (index === 17) {
-                    if (activeText) activeText.classList.add('s18-delayed-in');
-                    setTimeout(function() {
-                        if (currentIndex !== 17) return;
-                        document.getElementById('finalFade').classList.add('active');
-                        var fadeSteps = 20;
-                        var step = 0;
-                        var fadeTimer = setInterval(function() {
-                            step++;
-                            ambientAudio.volume = Math.max(0, 0.135 * (1 - step / fadeSteps));
-                            if (step >= fadeSteps) {
-                                clearInterval(fadeTimer);
-                                ambientAudio.pause();
-                            }
-                        }, 100);
-                    }, 5200);
-                } else if (index !== 11) {
-                    setTimeout(function() { hint.classList.add('visible'); }, 1200);
-                }
-                setTimeout(function() { isTransitioning = false; }, 800);
-                return;
-            }
-
-            if (state.type === 'feed-iframe') {
-                setTimeout(function() { hint.classList.add('visible'); }, 1200);
-                setTimeout(function() { isTransitioning = false; }, 800);
-                setTimeout(focusStoryShell, 200);
-                return;
-            }
-
-            if (state.type === 'video') {
-                setTimeout(function() { isTransitioning = false; }, 800);
-                if (index === 12) {
-                    var vR = activeEl.querySelector('video.story-video');
-                    if (vR) {
-                        var ruptureDone = false;
-                        function finishRupture() {
-                            if (ruptureDone || currentIndex !== 12) return;
-                            ruptureDone = true;
-                            if (autoTimer) { clearTimeout(autoTimer); autoTimer = null; }
-                            gotoState(13);
-                        }
-                        try {
-                            vR.pause();
-                            vR.currentTime = 0;
-                            vR.muted = false;
-                            vR.autoplay = true;
-                            vR.onended = finishRupture;
-                            vR.classList.add('s13-delayed-fade');
-                            autoTimer = setTimeout(function () {
-                                if (currentIndex !== 12) return;
-                                vR.play().catch(function () {});
-                            }, 2000);
-                            setTimeout(function () {
-                                if (currentIndex === 12 && !ruptureDone) {
-                                    autoTimer = setTimeout(finishRupture, 12000);
-                                }
-                            }, 2400);
-                        } catch (err) {
-                            autoTimer = setTimeout(finishRupture, 4500);
-                        }
-                    }
-                    return;
-                }
-                if (!startActiveVideo(index, activeEl)) {
-                    autoTimer = setTimeout(function() {
-                        gotoState(index + 1);
-                    }, 7000);
-                }
-                return;
-            }
-
-            if (state.type === 'ui') {
-                if (index === 1) playBell(0.9);
-                if (index === 15 && activeIframeEl) {
-                    activeIframeEl.classList.add('s14-delayed-play');
-                }
-                setTimeout(function() { hint.classList.add('visible'); }, 1200);
-                setTimeout(function() { isTransitioning = false; }, 800);
-                setTimeout(focusStoryShell, 200);
-                return;
-            }
-
-            if (state.type === 'audio-s30') {
-                blackoutLock = true;
-                var barsContainer = activeEl.querySelector('.audio-bars');
-                if (barsContainer) {
-                    barsContainer.classList.add('s30-anim');
-                }
-                setTimeout(function() {
-                    document.getElementById('blackoutOverlay').classList.add('dimming');
-                }, 2000);
-                setTimeout(function() {
-                    document.getElementById('blackoutOverlay').classList.remove('dimming');
-                    blackoutLock = false;
-                    gotoState(index + 1);
-                }, 3500);
-                setTimeout(function() { isTransitioning = false; }, 800);
-                return;
-            }
-
-            if (state.type === 'ui-s32') {
-                playBell(0.9);
-                var labelEl = activeEl.querySelector('.ui-placeholder-label');
-                var iframeEl = activeEl.querySelector('iframe');
-                try {
-                    if (navigator.vibrate) {
-                        navigator.vibrate(400);
-                    } else if (labelEl) {
-                        labelEl.classList.add('shake');
-                    } else if (iframeEl) {
-                        iframeEl.classList.add('shake');
-                    }
-                } catch (e) {
-                    if (labelEl) {
-                        labelEl.classList.add('shake');
-                    } else if (iframeEl) {
-                        iframeEl.classList.add('shake');
-                    }
-                }
-                setTimeout(function() { isTransitioning = false; }, 800);
-                autoTimer = setTimeout(function() {
-                    gotoState(index + 1);
-                }, 1500);
-                return;
-            }
-
-            setTimeout(function() { isTransitioning = false; }, 800);
-        }
-
-        init();
-    </script>
+        if (e.key === 'ArrowUp') gotoState(currentIndex - 1);
+      });
+    })();
+  </script>
 </body>
 </html>
